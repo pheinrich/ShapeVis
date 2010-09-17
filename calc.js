@@ -1,4 +1,11 @@
 /**
+ *  Zetamari
+ *
+ *  Copyright (c) 2004,2010  Peter Heinrich
+ *  All Rights Reserved
+ */
+
+/**
  *  Make sure this page isn't trapped in someone else's frame.
  */
 if( top != self )
@@ -111,7 +118,9 @@ function showModel( name, area, glass, queryString )
       }
    }
 
-   openWindow( "/servlet/com.zetamari.calc.ModelShape?" + queryString + "&cw=" + cw + "&ch=" + ch + "&sk=" + sk + "&t=" + title );
+   openWindow( "http://saphum.com/cgi-bin/shapevis?" + queryString + "&cw=" + cw + "&ch=" + ch + "&sk=" + (sk ? 1 : 0) + (st ? "&t=" + escape( title ) : "") );
+/*   alert( "http://saphum.com/cgi-bin/shapevis?" + queryString + "&cw=" + cw + "&ch=" + ch + "&sk=" + (sk ? 1 : 0) + (st ? "&t=" + escape( title ) : "") );
+*/
 }
 
 function openWindow( url )
@@ -230,7 +239,7 @@ function docircle()
       glass = estimateGlass( glass, id, id );
 
       result.innerHTML = showResult( area );
-      enableModel( 'Circle', 'circle_view', area, glass, 'shape=3&ow=' + od + '&iw=' + id );
+      enableModel( 'Circle', 'circle_view', area, glass, 's=3&w=' + od + '&iw=' + id );
    }
    else
    {
@@ -270,7 +279,7 @@ function docathedral()
       glass = estimateGlass( glass, w, h );
 
       result.innerHTML = showResult( area );
-      enableModel( 'Cathedral', 'cathedral_view', area, glass, 'shape=1&w=' + width + '&h=' + height + "&b=" + border );
+      enableModel( 'Cathedral', 'cathedral_view', area, glass, 's=1&w=' + width + '&h=' + height + "&b=" + border );
    }
    else
    {
@@ -311,7 +320,7 @@ function docathedral2()
       glass = estimateGlass( glass, w, h );
 
       result.innerHTML = showResult( area );
-      enableModel( 'Cathedral', 'cathedral2_view', area, glass, 'shape=2&w=' + width + '&h=' + height + "&b=" + border + "&a=" + base );
+      enableModel( 'Cathedral', 'cathedral2_view', area, glass, 's=2&w=' + width + '&h=' + height + "&b=" + border + "&a=" + base );
    }
    else
    {
@@ -376,7 +385,7 @@ function doellipse()
       glass = estimateGlass( glass, iw, ih );
 
       result.innerHTML = showResult( area );
-      enableModel( 'Oval', 'ellipse_view', area, glass, 'shape=4&ow=' + ow + '&oh=' + oh + "&iw=" + iw + "&ih=" + ih );
+      enableModel( 'Oval', 'ellipse_view', area, glass, 's=4&w=' + ow + '&h=' + oh + "&iw=" + iw + "&ih=" + ih );
    }
    else
    {
@@ -411,7 +420,7 @@ function dorectangle()
       glass = estimateGlass( glass, width - 2*border, height - 2*border );
 
       result.innerHTML = showResult( area );
-      enableModel( 'Rectangle', 'rectangle_view', area, glass, 'shape=5&w=' + width + '&h=' + height + "&b=" + border );
+      enableModel( 'Rectangle', 'rectangle_view', area, glass, 's=5&w=' + width + '&h=' + height + "&b=" + border );
    }
    else
    {
@@ -445,7 +454,7 @@ function dosquare()
       glass = estimateGlass( glass, width - 2*border, width - 2*border );
 
       result.innerHTML = showResult( area );
-      enableModel( 'Square', 'square_view', area, glass, 'shape=6&w=' + width + '&b=' + border );
+      enableModel( 'Square', 'square_view', area, glass, 's=6&w=' + width + '&b=' + border );
    }
    else
    {
@@ -491,7 +500,7 @@ function dovesica()
       glass = estimateGlass( glass, w, constant );
 
       result.innerHTML = showResult( area );
-      enableModel( 'Vesica Pisces', 'vesica_view', area, glass, 'shape=7&w=' + width + '&b=' + border );
+      enableModel( 'Vesica Pisces', 'vesica_view', area, glass, 's=7&w=' + width + '&b=' + border );
    }
    else
    {
