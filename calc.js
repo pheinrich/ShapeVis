@@ -118,15 +118,15 @@ function showModel( name, area, glass, queryString )
       }
    }
 
-   openWindow( "http://saphum.com/cgi-bin/shapevis?" + queryString + "&cw=" + cw + "&ch=" + ch + "&sk=" + (sk ? 1 : 0) + (st ? "&t=" + escape( title ) : "") );
-/*   alert( "http://saphum.com/cgi-bin/shapevis?" + queryString + "&cw=" + cw + "&ch=" + ch + "&sk=" + (sk ? 1 : 0) + (st ? "&t=" + escape( title ) : "") );
+   openWindow( "shapevis.php?" + queryString + "&cw=" + cw + "&ch=" + ch + "&sk=" + (sk ? 1 : 0) + (st ? "&t=" + escape( title ) : "") );
+/*   alert( "shapevis.php?" + queryString + "&cw=" + cw + "&ch=" + ch + "&sk=" + (sk ? 1 : 0) + (st ? "&t=" + escape( title ) : "") );
 */
 }
 
 function openWindow( url )
 {
    var cw = getObject( 'canvas_width' ).value - -25;
-   var ch = getObject( 'canvas_height' ).value - -25;
+   var ch = getObject( 'canvas_height' ).value - -40;
 
    newwindow = window.open( url, 'shape', 'height=' + ch + ',width=' + cw + ',directories=no,location=no,menubar=no,resizable=no,scrollbars=no,status=no,toolbar=no' );
 
