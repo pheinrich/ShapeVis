@@ -319,20 +319,40 @@ function ShapeVis( sectionId )
     this.current = '';
 
     var self = this;
-    this.canvas.addEventListener( "mousemove", function( event ) {
-	    self.mouseMove( event );
-	}, false );
+    this.canvas.addEventListener( "mousemove", function() { self.mouseMove(); }, false );
+    this.canvas.addEventListener( "mousedown", function() { self.mouseDown(); }, false );
+    this.canvas.addEventListener( "mouseup",   function() { self.mouseUp(); },   false );
 }
 
-ShapeVis.prototype.mouseMove = function( event )
+ShapeVis.prototype.mouseMove = function()
 {
-    var position = getPosition( event );
+    var position = getPosition();
     var message = "Mouse position: " + position.x + ", " + position.y;
 
     this.context.clearRect( 0, 0, this.canvas.width, this.canvas.height );
     this.context.font = "18pt Calibri";
     this.context.fillStyle = "black";
     this.context.fillText( message, 10, 25 );
+}
+
+ShapeVis.prototype.mouseDown = function()
+{
+    var position = getPosition();
+    var message = "Mouse position: " + position.x + ", " + position.y;
+
+    this.context.font = "18pt Calibri";
+    this.context.fillStyle = "blue";
+    this.context.fillText( message, 10, 60 );
+}
+
+ShapeVis.prototype.mouseUp = function()
+{
+    var position = getPosition();
+    var message = "Mouse position: " + position.x + ", " + position.y;
+
+    this.context.font = "18pt Calibri";
+    this.context.fillStyle = "red";
+    this.context.fillText( message, 10, 95 );
 }
 
 ShapeVis.prototype.updateShapes = function( sectionId )
