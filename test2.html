@@ -1,0 +1,112 @@
+<html>
+  <head>
+    <title>Test Canvas Display</title>
+
+    <style type="text/css">
+      SECTION#samples UL.shapes {}
+      SECTION#samples UL.shapes LI {
+        display: none; }
+      SECTION#samples UL.shapes LI.selected {
+        display: block; } 
+
+      SECTION#shape-vis CANVAS.preview {
+        border: 1px solid black; }
+    </style>
+
+    <script type="text/javascript" src="/sites/all/modules/jquery_update/replace/jquery.min.js?x"></script>
+    <script type="text/javascript" src="shapevis.js"></script>
+  </head>
+  <body>
+    <h2>Test Canvas Display</h2>
+
+    <section id="samples">
+      <ul class="shapes">
+        <li class="circle">
+          <h3 class="name">Circle</h3>
+          <div class="params">
+            <span class="outside-width">24 in</span>
+            <span class="inside-width">18 in</span>
+          </div>
+        </li>
+        <li class="oval">
+          <h3 class="name">Oval</h3>
+          <div class="params">
+            <span class="outside-width">24 in</span>
+            <span class="inside-width">18 in</span>
+            <span class="outside-height">32 in</span>
+            <span class="inside-height">26 in</span>
+          </div>
+        </li>
+        <li class="square">
+          <h3 class="name">Square</h3>
+          <div class="params">
+            <span class="outside-width">24 in</span>
+            <span class="inside-width">18 in</span>
+          </div>
+        </li>
+        <li class="diamond">
+          <h3 class="name">Diamond</h3>
+          <div class="params">
+            <span class="outside-width">24 in</span>
+            <span class="inside-width">18 in</span>
+          </div>
+        </li>
+        <li class="rectangle">
+          <h3 class="name">Rectangle</h3>
+          <div class="params">
+            <span class="outside-width">24 in</span>
+            <span class="inside-width">18 in</span>
+            <span class="outside-height">32 in</span>
+            <span class="inside-height">26 in</span>
+          </div>
+        </li>
+        <li class="cathedral">
+          <h3 class="name">Cathedral</h3>
+          <div class="params">
+            <span class="outside-width">24 in</span>
+            <span class="inside-width">18 in</span>
+            <span class="outside-height">32 in</span>
+            <span class="inside-height">26 in</span>
+          </div>
+        </li>
+         <li class="cathedral2">
+          <h3 class="name">Cathedral with Base</h3>
+          <div class="params">
+            <span class="outside-width">24 in</span>
+            <span class="inside-width">18 in</span>
+            <span class="outside-height">32 in</span>
+            <span class="inside-height">22 in</span>
+          </div>
+        </li>
+        <li class="gothic">
+          <h3 class="name">Gothic</h3>
+          <div class="params">
+            <span class="outside-width">24 in</span>
+            <span class="inside-width">18 in</span>
+            <span class="outside-height">32 in</span>
+            <span class="inside-height">26 in</span>
+          </div>
+        </li>
+        <li class="vesica">
+          <h3 class="name">Vesica Pisces</h3>
+          <div class="params">
+            <span class="outside-width">24 in</span>
+            <span class="inside-width">18 in</span>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <section id="shape-vis">
+      <canvas class="preview" width="500" height="500">
+        Canvas element not supported.
+      </canvas>
+    </section>
+
+    <script type="text/javascript">
+      var shapeVis = new ShapeVis( "#shape-vis" );
+      shapeVis.updateShapes( "#samples" );
+      shapeVis.draw();
+    </script>
+  </body>
+</html>
