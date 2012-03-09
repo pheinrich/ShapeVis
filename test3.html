@@ -1,0 +1,78 @@
+<html>
+  <head>
+    <title>Test Outline Display</title>
+
+    <style type="text/css">
+      SECTION#shape-vis CANVAS.preview {
+        border: 1px solid black; }
+    </style>
+
+    <script type="text/javascript" src="/sites/all/modules/jquery_update/replace/jquery.min.js?x"></script>
+    <script type="text/javascript" src="outline.js"></script>
+  </head>
+  <body>
+    <h2>Test Outline Display</h2>
+
+    <section id="shape-vis">
+      <canvas class="preview" width="500" height="500">
+        Canvas element not supported.
+      </canvas>
+    </section>
+
+    <script type="text/javascript">
+      var ro = new RectangleOutline( 250, 150 );
+      var handle = null;
+
+      var root = $("#shape-vis");
+      var canvas = root.find( "canvas" )[0];
+      var context = canvas.getContext( "2d" );
+
+      function getPosition( event )
+      {
+        var target;
+
+        if( !event )
+	  event = window.event;
+
+        if( event.target )
+	  target = event.target;
+        else if( event.srcElement )
+	  target = event.srcElement;
+
+        // Defeat Safari bug.
+        if( 3 == target.nodeType )
+	  target = target.parentNode;
+
+        return {
+	  x: event.pageX - $(target).offset().left,
+	  y: event.pageY - $(target).offset().top
+        };
+      }
+
+      function mouseMove()
+      {
+        if( handle && ro.resize( handle, getPosition() ) )
+        {
+          context.clearRect( 0, 0, canvas.width, canvas.height );
+          ro.draw( context );
+        }
+      }
+
+      function mouseDown()
+      {
+        handle = ro.getHandle( getPosition() );
+      }
+
+      function mouseUp()
+      {
+        handle = null;
+      }
+
+      canvas.addEventListener( "mousemove", mouseMove, false );
+      canvas.addEventListener( "mousedown", mouseDown, false );
+      canvas.addEventListener( "mouseup",   mouseUp,   false );
+
+      ro.draw( context );
+    </script>
+  </body>
+</html>
