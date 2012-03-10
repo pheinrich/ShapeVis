@@ -28,8 +28,8 @@
       var context = canvas.getContext( "2d" );
 
       var extent = ro.getExtent();
-      var vx = 1.0, vy = 1;
-      var tx = (canvas.width - extent.width) / (2*vx), ty = (canvas.height - extent.height) / (2*vy);
+      var vx = 0.85, vy = 1.625;
+      var tx = canvas.width / 2, ty = canvas.height / 2;
 
       function getPosition( event )
       {
@@ -75,10 +75,6 @@
       {
         if( ro.resize( handle, getPosition() ) )
         {
-          extent = ro.getExtent();
-          tx = (canvas.width - extent.width) / (2*vx);
-          ty = (canvas.height - extent.height) / (2*vy);
-
           context.clearRect( 0, 0, canvas.width, canvas.height );
           draw();
         }

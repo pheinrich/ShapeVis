@@ -21,8 +21,8 @@ function RectangleOutline( width, height )
 {
     Outline.call( this );
 
-    this.left   = 0;
-    this.top    = 0;
+    this.left   = -width / 2;
+    this.top    = -height / 2;
     this.width  = width;
     this.height = height;
 }
@@ -57,18 +57,24 @@ RectangleOutline.prototype.resize = function( handle, point, limit )
 	if( Outline.handlePos.N & handle.pos )
 	{
 	    rect.top += delta.y;
-	    rect.height -= delta.y;
+	    rect.height -= 2*delta.y;
 	}
 	else if( Outline.handlePos.S & handle.pos )
-	    rect.height += delta.y
+	{
+	    rect.top -= delta.y;
+	    rect.height += 2*delta.y;
+	}
 
 	if( Outline.handlePos.W & handle.pos )
 	{
 	    rect.left += delta.x;
-	    rect.width -= delta.x;
+	    rect.width -= 2*delta.x;
 	}
 	else if( Outline.handlePos.E & handle.pos )
-	    rect.width += delta.x;
+	{
+	    rect.left -= delta.x;
+	    rect.width += 2*delta.x;
+	}
 
 	valid = !limit || limit( rect );
 	if( valid )
