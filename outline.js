@@ -102,3 +102,46 @@ RectangleOutline.prototype.trace = function( context )
     context.beginPath();
     context.rect( this.left, this.top, this.width, this.height );
 }
+
+EllipseOutline.prototype = new RectangleOutline;
+EllipseOutline.prototype.constructor = EllipseOutline;
+function EllipseOutline( width, height )
+{
+    RectangleOutline.call( this, width, height );
+}
+
+EllipseOutline.contains = function( point, a, b )
+{
+    return( 1 > (point.x*point.x)/(a*a) + (point.y*point.y)/(b*b) );
+}
+
+EllipseOutline.prototype.getHandle = function( point )
+{
+    var pos = 0;
+    var outsideMin = !EllipseOutline.contains( point,
+			      (this.width - Outline.handleSize) / 2,
+			      (this.height - Outline.handleSize) / 2 );
+    var insideMax = EllipseOutline.contains( point,
+			      (this.width + Outline.handleSize) / 2,
+			      (this.height + Outline.handleSize) / 2 );
+
+    if( outsideMin && insideMax )
+    {
+	if( Outline.handleSize < Math.abs( point.x ) )
+	    pos += (0 < point.x) ? Outline.handlePos.E : Outline.handlePos.W;
+
+	if( Outline.handleSize < Math.abs( point.y ) )
+	    pos += (0 < point.y) ? Outline.handlePos.S : Outline.handlePos.N;
+    }
+
+    return( pos ? { x: point.x, y: point.y, pos: pos } : null );
+}
+
+EllipseOutline.prototype.trace = function( context )
+{
+    context.save();
+    context.beginPath();
+    context.scale( this.width / 2, this.height / 2 );
+    context.arc( 0, 0, 1, 0, 2*Math.PI, false );
+    context.restore();
+}
