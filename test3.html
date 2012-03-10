@@ -27,6 +27,10 @@
       var canvas = root.find( "canvas" )[0];
       var context = canvas.getContext( "2d" );
 
+      var extent = ro.getExtent();
+      var vx = 1.0, vy = 1;
+      var tx = (canvas.width - extent.width) / (2*vx), ty = (canvas.height - extent.height) / (2*vy);
+
       function getPosition( event )
       {
         var target;
@@ -43,18 +47,40 @@
         if( 3 == target.nodeType )
 	  target = target.parentNode;
 
+        var x = event.pageX - $(target).offset().left;
+        var y = event.pageY - $(target).offset().top;
+
         return {
-	  x: event.pageX - $(target).offset().left,
-	  y: event.pageY - $(target).offset().top
+	  x: (x - tx) / vx,
+	  y: (y - ty) / vy
         };
+      }
+
+      function draw()
+      {
+          context.save();
+          context.transform( vx, 0, 0, vy, tx, ty );
+          ro.trace( context );
+          context.restore();
+
+          context.fillStyle = "#eda";
+          context.strokeStyle = "#000";
+          context.lineWidth = 3;
+
+          context.fill();
+          context.stroke();
       }
 
       function mouseMove()
       {
-        if( handle && ro.resize( handle, getPosition() ) )
+        if( ro.resize( handle, getPosition() ) )
         {
+          extent = ro.getExtent();
+          tx = (canvas.width - extent.width) / (2*vx);
+          ty = (canvas.height - extent.height) / (2*vy);
+
           context.clearRect( 0, 0, canvas.width, canvas.height );
-          ro.draw( context );
+          draw();
         }
       }
 
@@ -72,7 +98,7 @@
       canvas.addEventListener( "mousedown", mouseDown, false );
       canvas.addEventListener( "mouseup",   mouseUp,   false );
 
-      ro.draw( context );
+      draw();
     </script>
   </body>
 </html>

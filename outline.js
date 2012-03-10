@@ -12,7 +12,7 @@ Outline.prototype.getHandle = function( point )
 
 Outline.prototype.resize = function( handle, point, limit )
 {
-    return false;
+    return null;
 }
 
 RectangleOutline.prototype = new Outline;
@@ -47,12 +47,12 @@ RectangleOutline.prototype.getHandle = function( point )
 
 RectangleOutline.prototype.resize = function( handle, point, limit )
 {
-    var allowed = false;
+    var valid = false;
 
     if( handle )
     {
         var delta = { x: point.x - handle.x, y: point.y - handle.y };
-	var rect = {  left: this.left, top: this.top, width: this.width, height: this.height };
+	var rect  = { left: this.left, top: this.top, width: this.width, height: this.height };
 
 	if( Outline.handlePos.N & handle.pos )
 	{
@@ -70,8 +70,8 @@ RectangleOutline.prototype.resize = function( handle, point, limit )
 	else if( Outline.handlePos.E & handle.pos )
 	    rect.width += delta.x;
 
-	allowed = !limit || limit( rect );
-	if( allowed )
+	valid = !limit || limit( rect );
+	if( valid )
 	{
 	    this.left   = rect.left;
 	    this.top    = rect.top;
@@ -83,17 +83,16 @@ RectangleOutline.prototype.resize = function( handle, point, limit )
 	}
     }
 
-    return( allowed );
+    return( valid );
 }
 
-RectangleOutline.prototype.draw = function( context )
+RectangleOutline.prototype.getExtent = function()
 {
-    context.fillStyle = "#eda";
-    context.strokeStyle = "#000";
-    context.lineWidth = 3;
+    return( { left: this.left, top: this.top, width: this.width, height: this.height } );
+}
 
+RectangleOutline.prototype.trace = function( context )
+{
     context.beginPath();
     context.rect( this.left, this.top, this.width, this.height );
-    context.fill();
-    context.stroke();
 }
