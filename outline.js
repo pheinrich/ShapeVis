@@ -64,24 +64,23 @@ RectangleOutline.prototype.getHandle = function( point, zoom )
     return( pos ? { x: point.x, y: point.y, pos: pos } : null );
 }
 
-RectangleOutline.prototype.resize = function( handle, point, limit, lockAspect )
+RectangleOutline.prototype.resize = function( handle, limit, lockAspect )
 {
     var valid = false;
 
     if( handle )
     {
-        var delta = { x: point.x - handle.x, y: point.y - handle.y };
 	var rect  = { left: this.left, top: this.top, width: this.width, height: this.height };
 
 	if( Outline.handlePos.N & handle.pos )
-	    rect.height -= 2*delta.y;
+	    rect.height -= 2*handle.delta.y;
 	else if( Outline.handlePos.S & handle.pos )
-	    rect.height += 2*delta.y;
+	    rect.height += 2*handle.delta.y;
 
 	if( Outline.handlePos.W & handle.pos )
-	    rect.width -= 2*delta.x;
+	    rect.width -= 2*handle.delta.x;
 	else if( Outline.handlePos.E & handle.pos )
-	    rect.width += 2*delta.x;
+	    rect.width += 2*handle.delta.x;
 
 	if( lockAspect && 0 < this.width && 0 < this.height )
         {
@@ -90,12 +89,6 @@ RectangleOutline.prototype.resize = function( handle, point, limit, lockAspect )
 	    else
 		rect.height = rect.width * this.height / this.width;
 	}
-
-	if( 0 > rect.width )
-	    rect.width = -rect.width;
-
-	if( 0 > rect.height )
-	    rect.height = -rect.height;
 
 	rect.left = -rect.width / 2;
 	rect.top = -rect.height / 2;
@@ -107,9 +100,6 @@ RectangleOutline.prototype.resize = function( handle, point, limit, lockAspect )
 	    this.top    = rect.top;
 	    this.width  = rect.width;
 	    this.height = rect.height;
-
-	    handle.x = point.x;
-	    handle.y = point.y;
 	}
     }
 
@@ -119,6 +109,14 @@ RectangleOutline.prototype.resize = function( handle, point, limit, lockAspect )
 RectangleOutline.prototype.getExtent = function()
 {
     return( { left: this.left, top: this.top, width: this.width, height: this.height } );
+}
+
+RectangleOutline.prototype.setExtent = function( rect )
+{
+    this.left   = rect.left;
+    this.top    = rect.top;
+    this.width  = rect.width;
+    this.height = rect.height;
 }
 
 RectangleOutline.prototype.trace = function( context )
@@ -134,9 +132,9 @@ function SquareOutline( width )
 
 SquareOutline.inheritsFrom( RectangleOutline );
 
-SquareOutline.prototype.resize = function( handle, point, limit, lockAspect )
+SquareOutline.prototype.resize = function( handle, limit, lockAspect )
 {
-    return( this.parent.resize.call( this, handle, point, limit, true ) );
+    return( this.parent.resize.call( this, handle, limit, true ) );
 }
 
 function EllipseOutline( width, height )
@@ -160,10 +158,10 @@ EllipseOutline.prototype.getHandle = function( point, zoom )
 
     if( outsideMin && insideMax )
     {
-	if( Outline.handleSize < Math.abs( point.x ) )
+	if( handleSize < Math.abs( point.x ) )
 	    pos += (0 < point.x) ? Outline.handlePos.E : Outline.handlePos.W;
 
-	if( Outline.handleSize < Math.abs( point.y ) )
+	if( handleSize < Math.abs( point.y ) )
 	    pos += (0 < point.y) ? Outline.handlePos.S : Outline.handlePos.N;
     }
 
