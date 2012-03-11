@@ -1,3 +1,21 @@
+Function.prototype.inheritsFrom = function( parentClass )
+{
+    if( Function == parentClass.constructor )
+    {
+	this.prototype = new parentClass;
+	this.prototype.constructor = this;
+	this.prototype.parent = parentClass.prototype;
+    }
+    else
+    {
+	this.prototype = parentClass;
+	this.prototype.constructor = this;
+	this.prototype.parent = parentClass;
+    }
+
+    return( this );
+}
+
 function Outline()
 {
 }
@@ -15,8 +33,6 @@ Outline.prototype.resize = function( handle, point, limit )
     return null;
 }
 
-RectangleOutline.prototype = new Outline;
-RectangleOutline.prototype.constructor = RectangleOutline;
 function RectangleOutline( width, height )
 {
     Outline.call( this );
@@ -27,25 +43,28 @@ function RectangleOutline( width, height )
     this.height = height;
 }
 
-RectangleOutline.prototype.getHandle = function( point )
-{
-    var pos = 0;
-    var offset = { x: point.x - this.left, y: point.y - this.top };
+RectangleOutline.inheritsFrom( Outline );
 
-    if( Outline.handleSize > Math.abs( offset.y ) )
+RectangleOutline.prototype.getHandle = function( point, zoom )
+{
+    var handleSize = Outline.handleSize / zoom;
+    var offset = { x: point.x - this.left, y: point.y - this.top };
+    var pos = 0;
+
+    if( handleSize > Math.abs( offset.y ) )
 	pos += Outline.handlePos.N;
-    else if( Outline.handleSize > Math.abs( offset.y - this.height ) )
+    else if( handleSize > Math.abs( offset.y - this.height ) )
 	pos += Outline.handlePos.S;
 
-    if( Outline.handleSize > Math.abs( offset.x ) )
+    if( handleSize > Math.abs( offset.x ) )
 	pos += Outline.handlePos.W;
-    else if( Outline.handleSize > Math.abs( offset.x - this.width ) )
+    else if( handleSize > Math.abs( offset.x - this.width ) )
 	pos += Outline.handlePos.E;
 
     return( pos ? { x: point.x, y: point.y, pos: pos } : null );
 }
 
-RectangleOutline.prototype.resize = function( handle, point, limit )
+RectangleOutline.prototype.resize = function( handle, point, limit, lockAspect )
 {
     var valid = false;
 
@@ -55,26 +74,31 @@ RectangleOutline.prototype.resize = function( handle, point, limit )
 	var rect  = { left: this.left, top: this.top, width: this.width, height: this.height };
 
 	if( Outline.handlePos.N & handle.pos )
-	{
-	    rect.top += delta.y;
 	    rect.height -= 2*delta.y;
-	}
 	else if( Outline.handlePos.S & handle.pos )
-	{
-	    rect.top -= delta.y;
 	    rect.height += 2*delta.y;
-	}
 
 	if( Outline.handlePos.W & handle.pos )
-	{
-	    rect.left += delta.x;
 	    rect.width -= 2*delta.x;
-	}
 	else if( Outline.handlePos.E & handle.pos )
-	{
-	    rect.left -= delta.x;
 	    rect.width += 2*delta.x;
+
+	if( lockAspect && 0 < this.width && 0 < this.height )
+        {
+	    if( (Outline.handlePos.N | Outline.handlePos.S) & handle.pos )
+		rect.width = rect.height * this.width / this.height;
+	    else
+		rect.height = rect.width * this.height / this.width;
 	}
+
+	if( 0 > rect.width )
+	    rect.width = -rect.width;
+
+	if( 0 > rect.height )
+	    rect.height = -rect.height;
+
+	rect.left = -rect.width / 2;
+	rect.top = -rect.height / 2;
 
 	valid = !limit || limit( rect );
 	if( valid )
@@ -103,27 +127,36 @@ RectangleOutline.prototype.trace = function( context )
     context.rect( this.left, this.top, this.width, this.height );
 }
 
-EllipseOutline.prototype = new RectangleOutline;
-EllipseOutline.prototype.constructor = EllipseOutline;
+function SquareOutline( width )
+{
+    RectangleOutline.call( this, width, width );
+}
+
+SquareOutline.inheritsFrom( RectangleOutline );
+
+SquareOutline.prototype.resize = function( handle, point, limit, lockAspect )
+{
+    return( this.parent.resize.call( this, handle, point, limit, true ) );
+}
+
 function EllipseOutline( width, height )
 {
     RectangleOutline.call( this, width, height );
 }
+
+EllipseOutline.inheritsFrom( RectangleOutline );
 
 EllipseOutline.contains = function( point, a, b )
 {
     return( 1 > (point.x*point.x)/(a*a) + (point.y*point.y)/(b*b) );
 }
 
-EllipseOutline.prototype.getHandle = function( point )
+EllipseOutline.prototype.getHandle = function( point, zoom )
 {
+    var handleSize = Outline.handleSize / zoom;
+    var outsideMin = !EllipseOutline.contains( point, (this.width - handleSize) / 2, (this.height - handleSize) / 2 );
+    var insideMax = EllipseOutline.contains( point, (this.width + handleSize) / 2, (this.height + handleSize) / 2 );
     var pos = 0;
-    var outsideMin = !EllipseOutline.contains( point,
-			      (this.width - Outline.handleSize) / 2,
-			      (this.height - Outline.handleSize) / 2 );
-    var insideMax = EllipseOutline.contains( point,
-			      (this.width + Outline.handleSize) / 2,
-			      (this.height + Outline.handleSize) / 2 );
 
     if( outsideMin && insideMax )
     {

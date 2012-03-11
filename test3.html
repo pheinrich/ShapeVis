@@ -17,10 +17,12 @@
       <canvas class="preview" width="500" height="500">
         Canvas element not supported.
       </canvas>
+      <input type="range" min="-3" max="3" value="0" onchange="setZoom( this.value )"/>
+      <span id="zoom">0</span>
     </section>
 
     <script type="text/javascript">
-      var ro = new EllipseOutline( 150, 250 );
+      var ro = new EllipseOutline( 150, 275 );
       var handle = null;
 
       var root = $("#shape-vis");
@@ -28,8 +30,15 @@
       var context = canvas.getContext( "2d" );
 
       var extent = ro.getExtent();
-      var vx = 1, vy = 1;
+      var zoom = 1;
       var tx = canvas.width / 2, ty = canvas.height / 2;
+
+      function setZoom( level )
+      {
+        $("#zoom").html( level );
+        zoom = Math.pow( 2, level );
+        redraw();
+      }
 
       function getPosition( event )
       {
@@ -51,15 +60,15 @@
         var y = event.pageY - $(target).offset().top;
 
         return {
-	  x: (x - tx) / vx,
-	  y: (y - ty) / vy
+	  x: (x - tx) / zoom,
+	  y: (y - ty) / zoom
         };
       }
 
       function draw()
       {
           context.save();
-          context.transform( vx, 0, 0, vy, tx, ty );
+          context.transform( zoom, 0, 0, zoom, tx, ty );
           ro.trace( context );
           context.restore();
 
@@ -74,15 +83,18 @@
       function mouseMove()
       {
         if( ro.resize( handle, getPosition() ) )
-        {
-          context.clearRect( 0, 0, canvas.width, canvas.height );
-          draw();
-        }
+          redraw();
+      }
+
+      function redraw()
+      {
+        context.clearRect( 0, 0, canvas.width, canvas.height );
+        draw();
       }
 
       function mouseDown()
       {
-        handle = ro.getHandle( getPosition() );
+        handle = ro.getHandle( getPosition(), zoom );
       }
 
       function mouseUp()
