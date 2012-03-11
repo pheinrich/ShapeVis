@@ -19,8 +19,17 @@
       </canvas>
       <input type="range" min="0" max="5" value="5" onchange="setZoom( this.value )"/>
       <span id="zoom">5</span><br/>
-      <input type="checkbox" value="lock" onchange="setAspectLock( this )"/>Lock Aspect Ratio<br/>
-      <input type="button" value="Uniform Border" onclick="resetBorder()"/>
+      <input type="checkbox" value="lock" onchange="setAspectLock( this )"/>Lock Aspect Ratio
+      <input type="button" value="Uniform Border" onclick="resetBorder()"/><br/>
+
+      <div style="float: right;">
+        Area: <span id="area">0</span><br/>
+        Cost: <span id="cost">0</span>
+      </div>
+
+      Outside: <input type="text" id="width" size="5"/> &times; <input type="text" id="height" size="5"/><br/>
+      Inside: <input type="text" id="iwidth" size="5"/> &times; <input type="text" id="iheight" size="5"/><br/>
+      Border: <input type="text" id="border" size="5"/>
     </section>
 
     <script type="text/javascript">
@@ -39,7 +48,7 @@
       function setZoom( level )
       {
         $("#zoom").html( level );
-        zoom = Math.pow( 2, level - 8 );
+        zoom = Math.pow( 1.5, level - 10 );
         redraw();
       }
 
@@ -52,7 +61,7 @@
       {
         var inside = io.getExtent();
         var outside = oo.getExtent();
-        var border = Math.max( outside.width - inside.width, outside.height - inside.height );
+        var border = Math.min( outside.width - inside.width, outside.height - inside.height );
 
         inside.width = outside.width - border;
         inside.height = outside.height - border;
@@ -90,6 +99,12 @@
 
       function draw()
       {
+          var area = oo.getArea();
+
+          var extent = oo.getExtent();
+          $("#width").val( (Math.round( extent.width ) / 100) + " in" );
+          $("#height").val( (Math.round( extent.height ) / 100) + " in" );
+
           context.save();
           context.transform( zoom, 0, 0, zoom, tx, ty );
           oo.trace( context );
@@ -106,9 +121,16 @@
           io.trace( context );
           context.restore();
 
-          var extent = io.getExtent();
-          var gradient = context.createLinearGradient( 0, 0, canvas.width, canvas.height );
+          area -= io.getArea();
+          $("#area").html( (Math.round( area / 14400 ) / 100) + " ft<sup>2</sup> (" +
+                           (Math.round( area / 100 ) / 100) + " in<sup>2</sup>)" );
+          $("#cost").html( "$" + (Math.round( 325 * area / 14400 ) / 100) );
 
+          extent = io.getExtent();
+          $("#iwidth").val( (Math.round( extent.width ) / 100) + " in" );
+          $("#iheight").val( (Math.round( extent.height ) / 100) + " in" );
+
+          var gradient = context.createLinearGradient( 0, 0, canvas.width, canvas.height );
           gradient.addColorStop( 0, "#aaa" );
           gradient.addColorStop( 1, "#fff" );
 

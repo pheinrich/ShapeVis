@@ -33,6 +33,24 @@ Outline.prototype.resize = function( handle, point, limit )
     return null;
 }
 
+Outline.prototype.getExtent = function()
+{
+    return( { left: 0, top: 0, width: 0, height: 0 } );
+}
+
+Outline.prototype.setExtent = function( rect )
+{
+}
+
+Outline.prototype.getArea = function()
+{
+    return( 0 );
+}
+
+Outline.prototype.trace = function( context )
+{
+}
+
 function RectangleOutline( width, height )
 {
     Outline.call( this );
@@ -119,6 +137,11 @@ RectangleOutline.prototype.setExtent = function( rect )
     this.height = rect.height;
 }
 
+RectangleOutline.prototype.getArea = function()
+{
+    return( this.width * this.height );
+}
+
 RectangleOutline.prototype.trace = function( context )
 {
     context.beginPath();
@@ -166,6 +189,11 @@ EllipseOutline.prototype.getHandle = function( point, zoom )
     }
 
     return( pos ? { x: point.x, y: point.y, pos: pos } : null );
+}
+
+EllipseOutline.prototype.getArea = function()
+{
+    return( Math.PI/4 * this.width * this.height );
 }
 
 EllipseOutline.prototype.trace = function( context )
