@@ -1,0 +1,240 @@
+<html>
+  <head>
+    <title>Test Outline Display</title>
+
+    <link rel="stylesheet" type="text/css" href="/js/css/flick/jquery-ui-1.8.18.custom.css"/>
+    <style type="text/css">
+      CANVAS.preview {
+        border: 1px solid black; }
+    </style>
+
+    <style>
+      #tabs { margin-top: 1em; }
+      #tabs li .ui-icon-close { float: left; margin: 0.4em 0.2em 0 0; cursor: pointer; }
+      #add_tab { cursor: pointer; }
+    </style>
+
+    <script type="text/javascript" src="/js/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="/js/jquery-ui-1.8.18.custom.min.js"></script>
+    <script type="text/javascript" src="outline.js"></script>
+  </head>
+  <body>
+    <div>
+      <button id="add_tab">New...</button>
+      <div id="tabs">
+        <ul>
+          <li><a href="#tabs-1">Rectangle</a> <span class="ui-icon ui-icon-close">Remove Tab</span></li>
+        </ul>
+        <div id="tabs-1">
+          <canvas class="preview" width="500" height="500">
+            Canvas element not supported.
+          </canvas>
+
+          <input type="range" min="0" max="5" value="5" onchange="setZoom( this.value )"/>
+          <span id="zoom">5</span><br/>
+          <input type="checkbox" value="lock" onchange="setAspectLock( this )"/>Lock Aspect Ratio
+          <input type="button" value="Uniform Border" onclick="resetBorder()"/><br/>
+
+          <div style="float: right;">
+            Area: <span id="area">0</span><br/>
+            Cost: <span id="cost">0</span>
+          </div>
+
+          Outside: <input type="text" id="width" size="5"/> &times; <input type="text" id="height" size="5"/><br/>
+          Inside: <input type="text" id="iwidth" size="5"/> &times; <input type="text" id="iheight" size="5"/><br/>
+          Border: <input type="text" id="border" size="5"/>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      $(function() {
+        var tab_counter = 2;
+
+        // tabs init with a custom tab template and an "add" callback filling in the content
+        var $tabs = $("#tabs").tabs({
+          tabTemplate: "<li><a href='#{href}'>#{label}</a> <span class='ui-icon ui-icon-close'>Remove Tab</span></li>",
+          add: function( event, ui ) {
+            var tab_content = "Tab " + tab_counter + " content.";
+            $(ui.panel).append( "<p>" + tab_content + "</p>" );
+          }
+        });
+
+        $("#add_tab").button().click( function() {
+          var tab_title = "Tab " + tab_counter;
+
+          $tabs.tabs( "add", "#tabs-" + tab_counter, tab_title ).find( ".ui-tabs-nav" ).sortable( {axis: "x"} );
+          tab_counter++;
+        });
+
+        // close icon: removing the tab on click
+        // note: closable tabs gonna be an option in the future - see http://dev.jqueryui.com/ticket/3924
+        $("#tabs span.ui-icon-close").live( "click", function() {
+          var index = $("li", $tabs).index( $(this).parent() );
+          $tabs.tabs( "remove", index );
+        });
+
+        var oo = new EllipseOutline( 1500, 2750 );
+        var io = new EllipseOutline( 1000, 2250 );
+        var handle = null, selected = null;;
+
+        var root = $("#tabs-1");
+        var canvas = root.find( "canvas" )[0];
+        var context = canvas.getContext( "2d" );
+
+        var zoom = 1;
+        var tx = canvas.width / 2, ty = canvas.height / 2;
+        var lockAspect = false, lockBorder = true;;
+
+        function setZoom( level )
+        {
+          $("#zoom").html( level );
+          zoom = Math.pow( 1.5, level - 10 );
+          redraw();
+        }
+
+        function setAspectLock( checkbox )
+        {
+          lockAspect = $(checkbox).is( ":checked" );
+        }
+
+        function resetBorder()
+        {
+          var inside = io.getExtent();
+          var outside = oo.getExtent();
+          var border = Math.min( outside.width - inside.width, outside.height - inside.height );
+
+          inside.width = outside.width - border;
+          inside.height = outside.height - border;
+          inside.left = -inside.width / 2;
+          inside.top = -inside.height / 2;
+
+          io.setExtent( inside );
+          redraw();
+        }
+
+        function getPosition( event )
+        {
+          var target;
+
+          if( !event )
+	    event = window.event;
+
+          if( event.target )
+	    target = event.target;
+          else if( event.srcElement )
+	    target = event.srcElement;
+
+          // Defeat Safari bug.
+          if( 3 == target.nodeType )
+	    target = target.parentNode;
+
+          var x = event.pageX - $(target).offset().left;
+          var y = event.pageY - $(target).offset().top;
+
+          return {
+	    x: (x - tx) / zoom,
+	    y: (y - ty) / zoom
+          };
+        }
+
+        function draw()
+        {
+            var area = oo.getArea();
+
+            var extent = oo.getExtent();
+            $("#width").val( (Math.round( extent.width ) / 100) + " in" );
+            $("#height").val( (Math.round( extent.height ) / 100) + " in" );
+
+            context.save();
+            context.transform( zoom, 0, 0, zoom, tx, ty );
+            oo.trace( context );
+            context.restore();
+
+            context.fillStyle = "#eda";
+            context.strokeStyle = "#000";
+            context.lineWidth = 3;
+            context.fill();
+            context.stroke();
+
+            context.save();
+            context.transform( zoom, 0, 0, zoom, tx, ty );
+            io.trace( context );
+            context.restore();
+
+            area -= io.getArea();
+            $("#area").html( (Math.round( area / 14400 ) / 100) + " ft<sup>2</sup> (" +
+                             (Math.round( area / 100 ) / 100) + " in<sup>2</sup>)" );
+            $("#cost").html( "$" + (Math.round( 325 * area / 14400 ) / 100) );
+
+            extent = io.getExtent();
+            $("#iwidth").val( (Math.round( extent.width ) / 100) + " in" );
+            $("#iheight").val( (Math.round( extent.height ) / 100) + " in" );
+
+            var gradient = context.createLinearGradient( 0, 0, canvas.width, canvas.height );
+            gradient.addColorStop( 0, "#aaa" );
+            gradient.addColorStop( 1, "#fff" );
+
+            context.fillStyle = gradient;
+            context.lineWidth = 2;
+            context.fill();
+            context.stroke();
+        }
+
+        function mouseMove()
+        {
+          if( handle )
+          {
+            var point = getPosition();
+            var dirty = false;
+
+            handle.delta = { x: point.x - handle.x, y: point.y - handle.y };
+
+            if( selected == oo )
+              dirty = oo.resize( handle, null, lockAspect );
+
+            if( dirty || selected == io )
+              dirty |= io.resize( handle, null, lockAspect );
+
+            if( dirty )
+            {
+              handle.x = point.x; handle.y = point.y;
+              redraw();
+            }
+          }
+        }
+
+        function redraw()
+        {
+          context.clearRect( 0, 0, canvas.width, canvas.height );
+          draw();
+        }
+
+        function mouseDown()
+        {
+          handle = oo.getHandle( getPosition(), zoom );
+          if( handle )
+            selected = oo;
+          else
+          {
+            handle = io.getHandle( getPosition(), zoom );
+            if( handle )
+              selected = io;
+          }
+        }
+
+        function mouseUp()
+        {
+          handle = null;
+          selected = null;
+        }
+
+        canvas.addEventListener( "mousemove", mouseMove, false );
+        canvas.addEventListener( "mousedown", mouseDown, false );
+        canvas.addEventListener( "mouseup",   mouseUp,   false );
+
+        setZoom( 5 );
+      });
+    </script>
+  </body>
+</html>

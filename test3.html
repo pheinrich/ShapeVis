@@ -2,17 +2,47 @@
   <head>
     <title>Test Outline Display</title>
 
+    <link rel="stylesheet" type="text/css" href="/js/css/flick/jquery-ui-1.8.18.custom.css"/>
     <style type="text/css">
-      SECTION#shape-vis CANVAS.preview {
+      CANVAS.preview {
         border: 1px solid black; }
     </style>
 
-    <script type="text/javascript" src="/sites/all/modules/jquery_update/replace/jquery.min.js?x"></script>
+    <script type="text/javascript" src="/js/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="/js/jquery-ui-1.8.18.custom.min.js"></script>
     <script type="text/javascript" src="outline.js"></script>
   </head>
   <body>
     <h2>Test Outline Display</h2>
 
+    <div id="tabs">
+      <ul>
+        <li><a href="#t1">Rectangle</a></li>
+        <li><a href="#t2">Middle Tab</a></li>
+        <li><a href="#t3">New...</a></li>
+      </ul>
+
+      <div id="t1">
+        <canvas class="preview" width="500" height="500">
+          Canvas element not supported.  Please try again using:
+          <ul>
+            <li>Google Chrome</li>
+            <li>Mozilla Firefox</li>
+            <li>Safari</li>
+            <li>Opera</li>
+          </ul>
+        </canvas>
+      </div>
+
+      <div id="t2">
+        Placeholder
+      </div>
+
+      <div id="t3">
+        Another tab
+      </div>
+    </div>
+        
     <section id="shape-vis">
       <canvas class="preview" width="500" height="500">
         Canvas element not supported.
