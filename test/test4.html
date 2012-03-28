@@ -14,9 +14,14 @@
         display: block; }
       SECTION.preview DIV.zoom {
         float: right;
-        text-align: right; }
+        text-align: right;
+        vertical-align: top; }
+      SECTION.preview DIV.zoom SPAN {
+        vertical-align: top; }
       SECTION.preview DIV.controls {
         overflow: hidden; }
+      SECTION.preview HR {
+        margin-bottom: 25px; }
       SECTION.preview DIV.controls SPAN.cost {
         display: block;
         font-size: 1.5em; }
@@ -65,6 +70,20 @@
             </div>
 
             <div class="controls">
+              <input type="text" class="title" size="20"/>
+              <select>
+                <option value="circle">Circle</options>
+                <option value="ellipse">Oval</option>
+                <option value="rectangle">Rectangle</option>
+                <option value="square">Square</options>
+                <option value="diamond">Diamond</options>
+                <option value="cathedral">Cathedral</options>
+                <option value="gothic">Gothic</options>
+                <option value="vesica">Vesica</options>
+              </select>
+
+              <hr/>
+
               <span class="cost">Cost: <span>0</span></span>
               <span class="area">Area: <span>0</span></span>
 
@@ -80,24 +99,6 @@
               </div>
             </div>
           </section>
-
-          <canvas class="preview" width="500" height="500">
-            Canvas element not supported.
-          </canvas>
-
-          <input type="range" min="0" max="5" value="5" onchange="setZoom( this.value )"/>
-          <span id="zoom">5</span><br/>
-          <input type="checkbox" value="lock" onchange="setAspectLock( this )"/>Lock Aspect Ratio
-          <input type="button" value="Uniform Border" onclick="resetBorder()"/><br/>
-
-          <div style="float: right;">
-            Area: <span id="area">0</span><br/>
-            Cost: <span id="cost">0</span>
-          </div>
-
-          Outside: <input type="text" id="width" size="5"/> &times; <input type="text" id="height" size="5"/><br/>
-          Inside: <input type="text" id="iwidth" size="5"/> &times; <input type="text" id="iheight" size="5"/><br/>
-          Border: <input type="text" id="border" size="5"/>
         </div>
       </div>
     </div>
