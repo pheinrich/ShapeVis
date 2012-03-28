@@ -63,9 +63,8 @@ function RectangleOutline( width, height )
 
 RectangleOutline.inheritsFrom( Outline );
 
-RectangleOutline.prototype.getHandle = function( point, zoom )
+RectangleOutline.prototype.getHandle = function( point, handleSize )
 {
-    var handleSize = Outline.handleSize / zoom;
     var offset = { x: point.x - this.left, y: point.y - this.top };
     var pos = 0;
 
@@ -172,9 +171,8 @@ EllipseOutline.contains = function( point, a, b )
     return( 1 > (point.x*point.x)/(a*a) + (point.y*point.y)/(b*b) );
 }
 
-EllipseOutline.prototype.getHandle = function( point, zoom )
+EllipseOutline.prototype.getHandle = function( point, handleSize )
 {
-    var handleSize = Outline.handleSize / zoom;
     var outsideMin = !EllipseOutline.contains( point, (this.width - handleSize) / 2, (this.height - handleSize) / 2 );
     var insideMax = EllipseOutline.contains( point, (this.width + handleSize) / 2, (this.height + handleSize) / 2 );
     var pos = 0;

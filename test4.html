@@ -16,11 +16,17 @@
 
     <script type="text/javascript" src="/js/jquery-1.7.1.min.js"></script>
     <script type="text/javascript" src="/js/jquery-ui-1.8.18.custom.min.js"></script>
+    <script type="text/javascript" src="mirror.js"></script>
     <script type="text/javascript" src="outline.js"></script>
   </head>
   <body>
     <div>
       <button id="add_tab">New...</button>
+      <div>
+        <script type="text/javascript">
+          ShapeVis.tabContent();
+        </script>
+      </div>
       <div id="tabs">
         <ul>
           <li><a href="#tabs-1">Rectangle</a> <span class="ui-icon ui-icon-close">Remove Tab</span></li>
@@ -68,7 +74,6 @@
         });
 
         // close icon: removing the tab on click
-        // note: closable tabs gonna be an option in the future - see http://dev.jqueryui.com/ticket/3924
         $("#tabs span.ui-icon-close").live( "click", function() {
           var index = $("li", $tabs).index( $(this).parent() );
           $tabs.tabs( "remove", index );
@@ -212,12 +217,12 @@
 
         function mouseDown()
         {
-          handle = oo.getHandle( getPosition(), zoom );
+          handle = oo.getHandle( getPosition(), Outline.handleSize / zoom );
           if( handle )
             selected = oo;
           else
           {
-            handle = io.getHandle( getPosition(), zoom );
+            handle = io.getHandle( getPosition(), Outline.handleSize / zoom );
             if( handle )
               selected = io;
           }
