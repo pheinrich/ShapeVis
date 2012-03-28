@@ -1,0 +1,38 @@
+<html>
+  <head>
+    <title>Test Display</title>
+    <style type="text/css">@import "/sites/all/libraries/jquery.svg/jquery.svg.css";</style>
+    <style type="text/css">
+      #svgintro {
+        width: 200px;
+        height: 200px;
+        border: 1px solid black;
+        float: right;
+      }
+    </style>
+    <script type="text/javascript" src="/sites/all/modules/jquery_update/replace/jquery.min.js?x"></script>
+    <script type="text/javascript" src="/sites/all/libraries/jquery.svg/jquery.svg.js"></script>
+    <script type="text/javascript" src="test.js"></script>
+  </head>
+  <body>
+    <h2>Test Display</h2>
+
+    <div id="svgintro"></div>
+    
+    <script type="text/javascript">
+    function drawIntro( svg )
+    {
+/*
+      svg.circle( 75, 75, 50, {fill: 'none', stroke: 'red', strokeWidth: 3} ); 
+      var g = svg.group( {stroke: 'black', strokeWidth: 2} ); 
+      svg.line( g, 15, 75, 135, 75 ); 
+      svg.line( g, 75, 15, 75, 135 ); 
+*/
+      sel = new selection( 15, 75, 135, 75, 'red' );
+      sel.draw( svg );
+    }
+
+    $('#svgintro').svg({onLoad: drawIntro});
+    </script>
+  </body>
+</html>
