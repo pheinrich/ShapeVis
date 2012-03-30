@@ -64,9 +64,9 @@
               </canvas>
 
               <div class="zoom">
-                Zoom: <input type="range" min="0" max="5" value="5" onchange="setZoom( this.value )"/> <span>5</span>
+                Zoom: <input type="range" min="0" max="5" value="5"/> <span>5</span>
               </div>
-              <input type="checkbox" value="lock" onchange="setAspectLock( this )"/> Lock Aspect Ratio
+              <input class="aspect" type="checkbox" value="lock"/> Lock Aspect Ratio
             </div>
 
             <div class="controls">
@@ -95,7 +95,7 @@
                 <input type="text" class="iwidth" size="8"/> &times; <input type="text" class="iheight" size="8"/>
 
                 <span>Border:</span>
-                <input type="text" class="border" size="8"/> <input type="button" value="Make Uniform" onclick="resetBorder()"/>
+                <input type="text" class="border" size="8"/> <input type="button" value="Make Uniform"/>
               </div>
             </div>
           </section>
@@ -130,6 +130,10 @@
           $tabs.tabs( "remove", index );
         });
 
+        $("div.zoom input").change( setZoom );
+        $("div.view input:checkbox").click( setAspectLock );
+        $("div.dimensions input[type='button']").click( resetBorder );
+
         var oo = new EllipseOutline( 1500, 2750 );
         var io = new EllipseOutline( 1000, 2250 );
         var handle = null, selected = null;;
@@ -142,16 +146,17 @@
         var tx = canvas.width / 2, ty = canvas.height / 2;
         var lockAspect = false, lockBorder = true;;
 
-        function setZoom( level )
+        function setZoom()
         {
-          $("#zoom").html( level );
+          var level = $("div.zoom input").val();
+          $("div.zoom span").html( level );
           zoom = Math.pow( 1.5, level - 10 );
           redraw();
         }
 
-        function setAspectLock( checkbox )
+        function setAspectLock()
         {
-          lockAspect = $(checkbox).is( ":checked" );
+          lockAspect = $("div.view input:checkbox").is( ":checked" );
         }
 
         function resetBorder()

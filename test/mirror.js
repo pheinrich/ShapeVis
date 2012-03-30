@@ -9,6 +9,5 @@ ShapeVis.tabTemplate = function( href, label )
 
 ShapeVis.tabContent = function()
 {
-    return();
+    return;
 }
-

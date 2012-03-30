@@ -5,10 +5,14 @@
               </canvas>
 
               <div class="zoom">
-                Zoom: <input type="range" min="0" max="5" value="5" onchange="setZoom( this.value )"/> <span>5</span>
+                Zoom: <input type="range" min="0" max="5" value="5"/> <span>5</span>
               </div>
               <input type="checkbox" value="lock" onchange="setAspectLock( this )"/> Lock Aspect Ratio
             </div>
+
+            <script type="text/javascript">
+              $("div.zoom input").change( setZoom );
+            </script>
 
             <div class="controls">
               <input type="text" class="title" size="20"/>
