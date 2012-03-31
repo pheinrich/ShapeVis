@@ -7,12 +7,8 @@
               <div class="zoom">
                 Zoom: <input type="range" min="0" max="5" value="5"/> <span>5</span>
               </div>
-              <input type="checkbox" value="lock" onchange="setAspectLock( this )"/> Lock Aspect Ratio
+              <input type="checkbox" value="lock"/> Lock Aspect Ratio
             </div>
-
-            <script type="text/javascript">
-              $("div.zoom input").change( setZoom );
-            </script>
 
             <div class="controls">
               <input type="text" class="title" size="20"/>
@@ -40,7 +36,7 @@
                 <input type="text" class="iwidth" size="8"/> &times; <input type="text" class="iheight" size="8"/>
 
                 <span>Border:</span>
-                <input type="text" class="border" size="8"/> <input type="button" value="Make Uniform" onclick="resetBorder()"/>
+                <input type="text" class="border" size="8"/> <input type="button" value="Make Uniform"/>
               </div>
             </div>
           </section>

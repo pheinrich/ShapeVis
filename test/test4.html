@@ -47,11 +47,6 @@
   <body>
     <div>
       <button id="add_tab">New...</button>
-      <div>
-        <script type="text/javascript">
-          ShapeVis.tabContent();
-        </script>
-      </div>
       <div id="tabs">
         <ul>
           <li><a href="#tabs-1">Rectangle</a> <span class="ui-icon ui-icon-close">Remove Tab</span></li>
@@ -105,7 +100,7 @@
 
     <script>
       $(function() {
-        var tab_counter = 2;
+        var tab_counter = 1;
 
         // tabs init with a custom tab template and an "add" callback filling in the content
         var $tabs = $("#tabs").tabs({
@@ -121,6 +116,7 @@
           var tab_title = "Tab " + tab_counter;
 
           $tabs.tabs( "add", "#tabs-" + tab_counter, tab_title ).find( ".ui-tabs-nav" ).sortable( {axis: "x"} );
+          new ShapeVis( $("#tabs-" + tab_counter) );
           tab_counter++;
         });
 
@@ -129,172 +125,6 @@
           var index = $("li", $tabs).index( $(this).parent() );
           $tabs.tabs( "remove", index );
         });
-
-        $("div.zoom input").change( setZoom );
-        $("div.view input:checkbox").click( setAspectLock );
-        $("div.dimensions input[type='button']").click( resetBorder );
-
-        var oo = new EllipseOutline( 1500, 2750 );
-        var io = new EllipseOutline( 1000, 2250 );
-        var handle = null, selected = null;;
-
-        var root = $("#tabs-1");
-        var canvas = root.find( "canvas" )[0];
-        var context = canvas.getContext( "2d" );
-
-        var zoom = 1;
-        var tx = canvas.width / 2, ty = canvas.height / 2;
-        var lockAspect = false, lockBorder = true;;
-
-        function setZoom()
-        {
-          var level = $("div.zoom input").val();
-          $("div.zoom span").html( level );
-          zoom = Math.pow( 1.5, level - 10 );
-          redraw();
-        }
-
-        function setAspectLock()
-        {
-          lockAspect = $("div.view input:checkbox").is( ":checked" );
-        }
-
-        function resetBorder()
-        {
-          var inside = io.getExtent();
-          var outside = oo.getExtent();
-          var border = Math.min( outside.width - inside.width, outside.height - inside.height );
-
-          inside.width = outside.width - border;
-          inside.height = outside.height - border;
-          inside.left = -inside.width / 2;
-          inside.top = -inside.height / 2;
-
-          io.setExtent( inside );
-          redraw();
-        }
-
-        function getPosition( event )
-        {
-          var target;
-
-          if( !event )
-	    event = window.event;
-
-          if( event.target )
-	    target = event.target;
-          else if( event.srcElement )
-	    target = event.srcElement;
-
-          // Defeat Safari bug.
-          if( 3 == target.nodeType )
-	    target = target.parentNode;
-
-          var x = event.pageX - $(target).offset().left;
-          var y = event.pageY - $(target).offset().top;
-
-          return {
-	    x: (x - tx) / zoom,
-	    y: (y - ty) / zoom
-          };
-        }
-
-        function draw()
-        {
-            var area = oo.getArea();
-
-            var extent = oo.getExtent();
-            $("#width").val( (Math.round( extent.width ) / 100) + " in" );
-            $("#height").val( (Math.round( extent.height ) / 100) + " in" );
-
-            context.save();
-            context.transform( zoom, 0, 0, zoom, tx, ty );
-            oo.trace( context );
-            context.restore();
-
-            context.fillStyle = "#eda";
-            context.strokeStyle = "#000";
-            context.lineWidth = 3;
-            context.fill();
-            context.stroke();
-
-            context.save();
-            context.transform( zoom, 0, 0, zoom, tx, ty );
-            io.trace( context );
-            context.restore();
-
-            area -= io.getArea();
-            $("#area").html( (Math.round( area / 14400 ) / 100) + " ft<sup>2</sup> (" +
-                             (Math.round( area / 100 ) / 100) + " in<sup>2</sup>)" );
-            $("#cost").html( "$" + (Math.round( 325 * area / 14400 ) / 100) );
-
-            extent = io.getExtent();
-            $("#iwidth").val( (Math.round( extent.width ) / 100) + " in" );
-            $("#iheight").val( (Math.round( extent.height ) / 100) + " in" );
-
-            var gradient = context.createLinearGradient( 0, 0, canvas.width, canvas.height );
-            gradient.addColorStop( 0, "#aaa" );
-            gradient.addColorStop( 1, "#fff" );
-
-            context.fillStyle = gradient;
-            context.lineWidth = 2;
-            context.fill();
-            context.stroke();
-        }
-
-        function mouseMove()
-        {
-          if( handle )
-          {
-            var point = getPosition();
-            var dirty = false;
-
-            handle.delta = { x: point.x - handle.x, y: point.y - handle.y };
-
-            if( selected == oo )
-              dirty = oo.resize( handle, null, lockAspect );
-
-            if( dirty || selected == io )
-              dirty |= io.resize( handle, null, lockAspect );
-
-            if( dirty )
-            {
-              handle.x = point.x; handle.y = point.y;
-              redraw();
-            }
-          }
-        }
-
-        function redraw()
-        {
-          context.clearRect( 0, 0, canvas.width, canvas.height );
-          draw();
-        }
-
-        function mouseDown()
-        {
-          handle = oo.getHandle( getPosition(), Outline.handleSize / zoom );
-          if( handle )
-            selected = oo;
-          else
-          {
-            handle = io.getHandle( getPosition(), Outline.handleSize / zoom );
-            if( handle )
-              selected = io;
-          }
-        }
-
-        function mouseUp()
-        {
-          handle = null;
-          selected = null;
-        }
-
-        canvas.addEventListener( "mousemove", mouseMove, false );
-        canvas.addEventListener( "mousedown", mouseDown, false );
-        canvas.addEventListener( "mouseup",   mouseUp,   false );
-
-        setZoom( 5 );
       });
     </script>
   </body>
