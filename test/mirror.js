@@ -1,5 +1,8 @@
-function ShapeVis( panel )
+function ShapeVis( ui )
 {
+    var panel = $(ui.panel);
+
+    this.tab = $(ui.tab);
     this.canvas = panel.find( "canvas" )[0];
     this.context = this.canvas.getContext( "2d" );
 
@@ -16,19 +19,22 @@ function ShapeVis( panel )
 	lockAspect:  panel.find( "div.view input:checkbox" )[0],
 	zoomSlider:  panel.find( "div.zoom input" )[0],
 	zoomValue:   panel.find( "div.zoom span" )[0],
+        title:       panel.find( "div.controls input.title" )[0],
+        inWidth:     panel.find( "div.dimensions input.iwidth" )[0],
+        inHeight:    panel.find( "div.dimensions input.iheight" )[0],
+        outWidth:    panel.find( "div.dimensions input.width" )[0],
+        outHeight:   panel.find( "div.dimensions input.height" )[0],
+        border:      panel.find( "div.dimensions input.border" )[0],
         resetBorder: panel.find( "div.dimensions input[type='button']" )[0],
-
-        inWidth:   panel.find( "div.dimensions input.iwidth" )[0],
-        inHeight:  panel.find( "div.dimensions input.iheight" )[0],
-        outWidth:  panel.find( "div.dimensions input.width" )[0],
-        outHeight: panel.find( "div.dimensions input.height" )[0],
-        border:    panel.find( "div.dimensions input.border" )[0],
 
         cost: panel.find( "span.cost" )[0],
 	area: panel.find( "span.area" )[0]
     };
 
     var that = this;
+
+    $(this.controls.title).val( this.tab.text() );
+    $(this.controls.title).change( function() { that.tab.text( $(that.controls.title).val() ) } );
 
     $(this.controls.lockAspect).click(  function() { ShapeVis.doLockAspect( that ) } );
     $(this.controls.zoomSlider).change( function() { ShapeVis.doZoomSlider( that ) } );
@@ -69,6 +75,11 @@ ShapeVis.prototype.getPosition = function( event )
 	x: (x - this.origin.x) / this.zoom,
 	y: (y - this.origin.y) / this.zoom
     };
+}
+
+ShapeVis.doTitle = function( that )
+{
+    alert( $(that.controls.title).text() + ", " + that.tab.text() );
 }
 
 ShapeVis.doLockAspect = function( that )

@@ -61,7 +61,7 @@
           tabTemplate: "<li><a href='#{href}'>#{label}</a> <span class='ui-icon ui-icon-close'>Remove Tab</span></li>",
           add: function( event, ui ) {
             $(ui.panel).load( "tabcontent.html", function() {
-              new ShapeVis( $(ui.panel) );
+              new ShapeVis( ui );
             });
           }
         });
@@ -78,6 +78,8 @@
           var index = $("li", $tabs).index( $(this).parent() );
           $tabs.tabs( "remove", index );
         });
+
+        $("#add_tab").trigger( "click" );
       });
     </script>
   </body>
