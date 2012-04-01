@@ -48,53 +48,7 @@
     <div>
       <button id="add_tab">New...</button>
       <div id="tabs">
-        <ul>
-          <li><a href="#tabs-1">Rectangle</a> <span class="ui-icon ui-icon-close">Remove Tab</span></li>
-        </ul>
-        <div id="tabs-1">
-          <section class="preview">
-            <div class="view">
-              <canvas width="500" height="500">
-                Canvas element not supported.
-              </canvas>
-
-              <div class="zoom">
-                Zoom: <input type="range" min="0" max="5" value="5"/> <span>5</span>
-              </div>
-              <input class="aspect" type="checkbox" value="lock"/> Lock Aspect Ratio
-            </div>
-
-            <div class="controls">
-              <input type="text" class="title" size="20"/>
-              <select>
-                <option value="circle">Circle</options>
-                <option value="ellipse">Oval</option>
-                <option value="rectangle">Rectangle</option>
-                <option value="square">Square</options>
-                <option value="diamond">Diamond</options>
-                <option value="cathedral">Cathedral</options>
-                <option value="gothic">Gothic</options>
-                <option value="vesica">Vesica</options>
-              </select>
-
-              <hr/>
-
-              <span class="cost">Cost: <span>0</span></span>
-              <span class="area">Area: <span>0</span></span>
-
-              <div class="dimensions">
-                <span>Outside:</span>
-                <input type="text" class="width" size="8"/> &times; <input type="text" class="height" size="8"/>
-
-                <span>Inside:</span>
-                <input type="text" class="iwidth" size="8"/> &times; <input type="text" class="iheight" size="8"/>
-
-                <span>Border:</span>
-                <input type="text" class="border" size="8"/> <input type="button" value="Make Uniform"/>
-              </div>
-            </div>
-          </section>
-        </div>
+        <ul/>
       </div>
     </div>
 
@@ -106,9 +60,9 @@
         var $tabs = $("#tabs").tabs({
           tabTemplate: "<li><a href='#{href}'>#{label}</a> <span class='ui-icon ui-icon-close'>Remove Tab</span></li>",
           add: function( event, ui ) {
-//            var tab_content = "Tab " + tab_counter + " content.";
-//            $(ui.panel).append( "<p>" + tab_content + "</p>" );
-            $(ui.panel).load( "tabcontent.html" );
+            $(ui.panel).load( "tabcontent.html", function() {
+              new ShapeVis( $(ui.panel) );
+            });
           }
         });
 
@@ -116,7 +70,6 @@
           var tab_title = "Tab " + tab_counter;
 
           $tabs.tabs( "add", "#tabs-" + tab_counter, tab_title ).find( ".ui-tabs-nav" ).sortable( {axis: "x"} );
-          new ShapeVis( $("#tabs-" + tab_counter) );
           tab_counter++;
         });
 
