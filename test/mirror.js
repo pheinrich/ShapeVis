@@ -20,6 +20,7 @@ function ShapeVis( ui )
 	zoomSlider:  panel.find( "div.zoom input" )[0],
 	zoomValue:   panel.find( "div.zoom span" )[0],
         title:       panel.find( "div.controls input.title" )[0],
+        select:      panel.find( "div.controls select" )[0],
         inWidth:     panel.find( "div.dimensions input.iwidth" )[0],
         inHeight:    panel.find( "div.dimensions input.iheight" )[0],
         outWidth:    panel.find( "div.dimensions input.width" )[0],
@@ -36,15 +37,17 @@ function ShapeVis( ui )
     $(this.controls.title).val( this.tab.text() );
     $(this.controls.title).change( function() { that.tab.text( $(that.controls.title).val() ) } );
 
-    $(this.controls.lockAspect).click(  function() { ShapeVis.doLockAspect( that ) } );
-    $(this.controls.zoomSlider).change( function() { ShapeVis.doZoomSlider( that ) } );
-    $(this.controls.resetBorder).click( function() { ShapeVis.doResetBorder( that ) } );
+    panel.find( "div.dimensions" ).change( function( event ) { that.doDimensions.call( that, event ) } );
+    $(this.controls.lockAspect).click( function( event ) { that.doLockAspect.call( that, event ) } );
+    $(this.controls.zoomSlider).change( function( event ) { that.doZoomSlider.call( that, event ) } );
+    $(this.controls.resetBorder).click( function( event ) { that.doResetBorder.call( that, event ) } );
+    $(this.controls.select).change( function( event ) { that.doSelectShape.call( that, event ) } );
 
-    this.canvas.addEventListener( "mousemove", function() { ShapeVis.mouseMove( that ) }, false );
-    this.canvas.addEventListener( "mousedown", function() { ShapeVis.mouseDown( that ) }, false );
-    this.canvas.addEventListener( "mouseup",   function() { ShapeVis.mouseUp( that ) },   false );
+    this.canvas.addEventListener( "mousemove", function( event ) { that.mouseMove.call( that, event ) }, false );
+    this.canvas.addEventListener( "mousedown", function( event ) { that.mouseDown.call( that, event ) }, false );
+    this.canvas.addEventListener( "mouseup",   function( event ) { that.mouseUp.call( that, event ) },   false );
 
-    ShapeVis.doZoomSlider( that );
+    this.doZoomSlider();
 }
 
 ShapeVis.tabTemplate = function( href, label )
@@ -77,29 +80,28 @@ ShapeVis.prototype.getPosition = function( event )
     };
 }
 
-ShapeVis.doTitle = function( that )
+ShapeVis.prototype.doDimensions = function( event )
 {
-    alert( $(that.controls.title).text() + ", " + that.tab.text() );
 }
 
-ShapeVis.doLockAspect = function( that )
+ShapeVis.prototype.doLockAspect = function( event )
 {
-    that.isAspectLocked = $(that.controls.lockAspect).is( ":checked" );
+    this.isAspectLocked = $(this.controls.lockAspect).is( ":checked" );
 }
 
-ShapeVis.doZoomSlider = function( that )
+ShapeVis.prototype.doZoomSlider = function( event )
 {
-    var value = $(that.controls.zoomSlider).val();
+    var value = $(this.controls.zoomSlider).val();
 
-    $(that.controls.zoomValue).html( value );
-    that.zoom = Math.pow( 1.5, value - 10 );
-    that.redraw();
+    $(this.controls.zoomValue).html( value );
+    this.zoom = Math.pow( 1.5, value - 10 );
+    this.redraw();
 }
 
-ShapeVis.doResetBorder = function( that )
+ShapeVis.prototype.doResetBorder = function( event )
 {
-    var inside = that.inLine.getExtent();
-    var outside = that.outLine.getExtent();
+    var inside = this.inLine.getExtent();
+    var outside = this.outLine.getExtent();
     var border = Math.min( outside.width - inside.width, outside.height - inside.height );
 
     inside.width = outside.width - border;
@@ -107,8 +109,70 @@ ShapeVis.doResetBorder = function( that )
     inside.left = -inside.width / 2;
     inside.top = -inside.height / 2;
 
-    that.inLine.setExtent( inside );
-    that.redraw();
+    this.inLine.setExtent( inside );
+    this.redraw();
+}
+
+ShapeVis.prototype.doSelectShape = function( event )
+{
+    var inside = this.inLine.getExtent();
+    var outside = this.outLine.getExtent();
+    var inLine = null;
+    var outLine = null;
+
+    switch( $(this.controls.select).val() )
+    {
+        case "circle":
+	    inLine = new CircleOutline( inside.width );
+	    outLine = new CircleOutline( outside.width );
+	    break;
+
+        case "ellipse":
+	    inLine = new EllipseOutline( inside.width, inside.height );
+	    outLine = new EllipseOutline( outside.width, outside.height );
+	    break;
+
+        case "square":
+	    inLine = new SquareOutline( inside.width );
+	    outLine = new SquareOutline( outside.width );
+	    break;
+
+        case "diamond":
+	    inLine = new DiamondOutline( inside.width );
+	    outLine = new DiamondOutline( outside.width );
+	    break;
+
+        case "cathedral":
+	    inLine = new CathedralOutline( inside.width, inside.height );
+	    outLine = new CathedralOutline( outside.width, outside.height );
+	    break;
+
+        case "gothic":
+	    inLine = new GothicOutline( inside.width, inside.height );
+	    outLine = new GothicOutline( outside.width, outside.height );
+	    break;
+
+        case "vesica":
+	    inLine = new VesicaOutline( inside.width );
+	    outLine = new VesicaOutline( outside.width );
+	    break;
+
+        default:
+	    inLine = new RectangleOutline( inside.width, inside.height );
+	    outLine = new RectangleOutline( outside.width, outside.height );
+	    break;
+    }
+
+    if( inLine && outLine )
+    {
+	this.inLine = inLine;
+	this.outLine = outLine;
+	this.handle = this.selected = null;
+
+	$(this.controls.title).val( $(this.controls.select).find( "option:selected" ).text() );
+	$(this.controls.title).trigger( "change" );
+	this.redraw();
+    }
 }
 
 ShapeVis.prototype.draw = function()
@@ -160,44 +224,44 @@ ShapeVis.prototype.redraw = function()
     this.draw();
 }
 
-ShapeVis.mouseMove = function( that )
+ShapeVis.prototype.mouseMove = function( event )
 {
-    if( that.handle )
+    if( this.handle )
     {
-	var point = that.getPosition();
+	var point = this.getPosition();
 	var dirty = false;
 
-	that.handle.delta = { x: point.x - that.handle.x, y: point.y - that.handle.y };
+	this.handle.delta = { x: point.x - this.handle.x, y: point.y - this.handle.y };
 
-	if( that.selected == that.outLine )
-	    dirty = that.outLine.resize( that.handle, null, that.isAspectLocked );
+	if( this.selected == this.outLine )
+	    dirty = this.outLine.resize( this.handle, null, this.isAspectLocked );
 
-	if( dirty || that.selected == that.inLine )
-	    dirty |= that.inLine.resize( that.handle, null, that.isAspectLocked );
+	if( dirty || this.selected == this.inLine )
+	    dirty |= this.inLine.resize( this.handle, null, this.isAspectLocked );
 
 	if( dirty )
         {
-	    that.handle.x = point.x; that.handle.y = point.y;
-	    that.redraw();
+	    this.handle.x = point.x; this.handle.y = point.y;
+	    this.redraw();
 	}
     }
 }
 
-ShapeVis.mouseDown = function( that )
+ShapeVis.prototype.mouseDown = function( event )
 {
-    that.handle = that.outLine.getHandle( that.getPosition(), Outline.handleSize / that.zoom );
-    if( that.handle )
-	that.selected = that.outLine;
+    this.handle = this.outLine.getHandle( this.getPosition(), Outline.handleSize / this.zoom );
+    if( this.handle )
+	this.selected = this.outLine;
     else
     {
-	that.handle = that.inLine.getHandle( that.getPosition(), Outline.handleSize / that.zoom );
-	if( that.handle )
-	    that.selected = that.inLine;
+	this.handle = this.inLine.getHandle( this.getPosition(), Outline.handleSize / this.zoom );
+	if( this.handle )
+	    this.selected = this.inLine;
     }
 }
 
-ShapeVis.mouseUp = function( that )
+ShapeVis.prototype.mouseUp = function( event )
 {
-    that.handle = null;
-    that.selected = null;
+    this.handle = null;
+    this.selected = null;
 }
