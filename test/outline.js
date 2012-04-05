@@ -166,15 +166,15 @@ function EllipseOutline( width, height )
 
 EllipseOutline.inheritsFrom( RectangleOutline );
 
-EllipseOutline.contains = function( point, a, b )
+EllipseOutline.prototype.contains = function( point, a, b )
 {
     return( 1 > (point.x*point.x)/(a*a) + (point.y*point.y)/(b*b) );
 }
 
 EllipseOutline.prototype.getHandle = function( point, handleSize )
 {
-    var outsideMin = !EllipseOutline.contains( point, (this.width - handleSize) / 2, (this.height - handleSize) / 2 );
-    var insideMax = EllipseOutline.contains( point, (this.width + handleSize) / 2, (this.height + handleSize) / 2 );
+    var outsideMin = !this.contains( point, (this.width - handleSize) / 2, (this.height - handleSize) / 2 );
+    var insideMax = this.contains( point, (this.width + handleSize) / 2, (this.height + handleSize) / 2 );
     var pos = 0;
 
     if( outsideMin && insideMax )
@@ -201,4 +201,43 @@ EllipseOutline.prototype.trace = function( context )
     context.scale( this.width / 2, this.height / 2 );
     context.arc( 0, 0, 1, 0, 2*Math.PI, false );
     context.restore();
+}
+
+function CircleOutline( diameter )
+{
+    EllipseOutline.call( this, diameter, diameter );
+}
+
+CircleOutline.inheritsFrom( EllipseOutline );
+
+CircleOutline.prototype.resize = function( handle, limit, lockAspect )
+{
+    return( this.parent.resize.call( this, handle, limit, true ) );
+}
+
+function DiamondOutline( width )
+{
+    CircleOutline.call( this, width );
+}
+
+DiamondOutline.inheritsFrom( CircleOutline );
+
+DiamondOutline.prototype.contains = function( point, a, b )
+{
+    return( a > Math.abs( point.x ) + Math.abs( point.y ) );
+}
+
+DiamondOutline.prototype.getArea = function()
+{
+    return( 0.5 * this.width * this.width );
+}
+
+DiamondOutline.prototype.trace = function( context )
+{
+    context.beginPath();
+    context.moveTo( this.left, 0 )
+    context.lineTo( 0, this.top );
+    context.lineTo( this.left + this.width, 0 );
+    context.lineTo( 0, this.top + this.height );
+    context.closePath();
 }
