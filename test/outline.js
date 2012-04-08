@@ -101,7 +101,7 @@ RectangleOutline.prototype.resize = function( handle, limit, lockAspect )
 
 	if( lockAspect && 0 < this.width && 0 < this.height )
         {
-	    if( (Outline.handlePos.N | Outline.handlePos.S) & handle.pos )
+	    if( Math.abs( handle.delta.x ) < Math.abs( handle.delta.y ) )
 		rect.width = rect.height * this.width / this.height;
 	    else
 		rect.height = rect.width * this.height / this.width;
@@ -156,7 +156,7 @@ SquareOutline.inheritsFrom( RectangleOutline );
 
 SquareOutline.prototype.resize = function( handle, limit, lockAspect )
 {
-    return( this.parent.resize.call( this, handle, limit, true ) );
+    return( SquareOutline.prototype.parent.resize.call( this, handle, limit, true ) );
 }
 
 function EllipseOutline( width, height )
@@ -212,7 +212,7 @@ CircleOutline.inheritsFrom( EllipseOutline );
 
 CircleOutline.prototype.resize = function( handle, limit, lockAspect )
 {
-    return( this.parent.resize.call( this, handle, limit, true ) );
+    return( CircleOutline.prototype.parent.resize.call( this, handle, limit, true ) );
 }
 
 function DiamondOutline( width )
