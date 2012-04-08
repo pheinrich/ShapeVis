@@ -159,6 +159,40 @@ SquareOutline.prototype.resize = function( handle, limit, lockAspect )
     return( SquareOutline.prototype.parent.resize.call( this, handle, limit, true ) );
 }
 
+function CathedralOutline( width, height )
+{
+    RectangleOutline.call( this, width, height );
+}
+
+CathedralOutline.inheritsFrom( RectangleOutline );
+
+CathedralOutline.prototype.contains = function( point, a, b )
+{
+}
+
+/*
+CathedralOutline.prototype.getHandle = function( point, handleSize )
+{
+}
+*/
+
+CathedralOutline.prototype.getArea = function()
+{
+    return( this.width * (this.height - this.width/2 * (1 - Math.PI/4)) );
+}
+
+CathedralOutline.prototype.trace = function( context )
+{
+    var radius = this.width / 2;
+    var h = this.height / 2;
+
+    context.beginPath();
+    context.arc( 0, radius - h, radius, 0, Math.PI, true );
+    context.lineTo( -radius, h );
+    context.lineTo( radius, h );
+    context.closePath();
+}
+
 function EllipseOutline( width, height )
 {
     RectangleOutline.call( this, width, height );
