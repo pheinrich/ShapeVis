@@ -36,6 +36,7 @@ function ShapeVis( ui )
 
     $(this.controls.title).val( this.tab.text() );
     $(this.controls.title).change( function() { that.tab.text( $(that.controls.title).val() ) } );
+    $(this.controls.select).val( "ellipse" );
 
     panel.find( "div.dimensions" ).change( function( event ) { that.doDimensions.call( that, event ) } );
     $(this.controls.lockAspect).click( function( event ) { that.doLockAspect.call( that, event ) } );
@@ -48,6 +49,7 @@ function ShapeVis( ui )
     this.canvas.addEventListener( "mouseup",   function( event ) { that.mouseUp.call( that, event ) },   false );
 
     this.doZoomSlider();
+    this.doSelectShape();
 }
 
 ShapeVis.tabTemplate = function( href, label )

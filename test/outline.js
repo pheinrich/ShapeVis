@@ -168,13 +168,51 @@ CathedralOutline.inheritsFrom( RectangleOutline );
 
 CathedralOutline.prototype.contains = function( point, a, b )
 {
+    var inside = false;
+    var h = a - b;
+
+    if( point.y < h )
+    {
+	h -= point.y;
+	inside = (a*a) > (point.x*point.x) + (h*h);
+    }
+    else
+	inside = Math.abs( point.x ) < a && Math.abs( point.y ) < b;
+
+    return( inside );
 }
 
-/*
 CathedralOutline.prototype.getHandle = function( point, handleSize )
 {
+    var outsideMin = !this.contains( point, (this.width - handleSize) / 2, (this.height - handleSize) / 2 );
+    var insideMax = this.contains( point, (this.width + handleSize) / 2, (this.height + handleSize) / 2 );
+    var pos = 0;
+
+    if( outsideMin && insideMax )
+    {
+	// Check if selecting upper (circular) edge.
+	if( 2 * point.y < this.width - this.height )
+	{
+	    pos = Outline.handlePos.N;
+	    if( handleSize < Math.abs( point.x ) )
+		pos += (0 < point.x) ? Outline.handlePos.E : Outline.handlePos.W;
+	}
+	else
+	{
+	    var offset = { x: point.x - this.left, y: point.y - this.top };
+
+	    if( handleSize > Math.abs( offset.y - this.height ) )
+		pos = Outline.handlePos.S;
+
+	    if( handleSize > Math.abs( offset.x ) )
+		pos += Outline.handlePos.W;
+	    else if( handleSize > Math.abs( offset.x - this.width ) )
+		pos += Outline.handlePos.E;
+	}
+    }
+
+    return( pos ? { x: point.x, y: point.y, pos: pos } : null );
 }
-*/
 
 CathedralOutline.prototype.getArea = function()
 {
