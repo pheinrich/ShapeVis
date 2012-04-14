@@ -1,3 +1,5 @@
+SQRT3 = Math.sqrt( 3 );
+
 Function.prototype.inheritsFrom = function( parentClass )
 {
     if( Function == parentClass.constructor )
@@ -110,7 +112,7 @@ RectangleOutline.prototype.resize = function( handle, limit, lockAspect )
 	rect.left = -rect.width / 2;
 	rect.top = -rect.height / 2;
 
-	valid = !limit || limit( rect );
+	valid = !limit || limit( this, rect );
 	if( valid )
 	{
 	    this.left   = rect.left;
@@ -214,6 +216,21 @@ CathedralOutline.prototype.getHandle = function( point, handleSize )
     return( pos ? { x: point.x, y: point.y, pos: pos } : null );
 }
 
+CathedralOutline.prototype.resize = function( handle, limit, lockAspect )
+{
+    if( this.container )
+    {
+	return( CathedralOutline.prototype.parent.resize.call( this, handle, function( outline, rect ) {
+		    if( handle.pos & Outline.handlePos.S )
+			rect.top = outline.top;
+		    rect.height += (outline.height - rect.height) / 2;
+		    return( !limit || limit( outline, rect ) );
+		}, lockAspect ) );
+    }
+    else
+	return( CathedralOutline.prototype.parent.resize.call( this, handle, limit, lockAspect ) );
+}
+
 CathedralOutline.prototype.getArea = function()
 {
     return( this.width * (this.height - this.width/2 * (1 - Math.PI/4)) );
@@ -222,13 +239,70 @@ CathedralOutline.prototype.getArea = function()
 CathedralOutline.prototype.trace = function( context )
 {
     var radius = this.width / 2;
-    var h = this.height / 2;
+    var bottom = this.top + this.height;
 
     context.beginPath();
-    context.arc( 0, radius - h, radius, 0, Math.PI, true );
-    context.lineTo( -radius, h );
-    context.lineTo( radius, h );
+    context.arc( 0, this.top + radius, radius, Math.PI, 0, false );
+    context.lineTo( radius, bottom );
+    context.lineTo( -radius, bottom );
     context.closePath();
+}
+
+function GothicOutline( width, height )
+{
+    RectangleOutline.call( this, width, height );
+}
+
+GothicOutline.inheritsFrom( RectangleOutline );
+
+GothicOutline.prototype.contains = function( point, a, b )
+{
+    return( GothicOutline.prototype.parent.contains.call( this, point, a, b ) );
+}
+
+GothicOutline.prototype.getHandle = function( point, handleSize )
+{
+    return( GothicOutline.prototype.parent.getHandle.call( this, point, handleSize ) );
+}
+
+GothicOutline.prototype.resize = function( handle, limit, lockAspect )
+{
+    return( GothicOutline.prototype.parent.resize.call( this, handle, limit, lockAspect ) );
+}
+
+GothicOutline.prototype.getArea = function()
+{
+    return( GothicOutline.prototype.parent.getArea.call( this ) );
+}
+
+GothicOutline.prototype.trace = function( context )
+{
+    if( this.container )
+    {
+	var border = (this.container.width - this.width) / 2;
+	var radius = (this.container.width + this.width) / 2;
+	var a = Math.acos( this.container.width / (2*radius) );
+	var y = (SQRT3*this.container.width - this.container.height) / 2;
+	var bottom = Math.min( this.container.height - border, y - (radius * Math.sin( a )) + this.height );
+
+	context.beginPath();
+	context.arc( this.container.width / 2, y, radius, Math.PI, Math.PI + a, false );
+	context.arc( -this.container.width / 2, y, radius, -a, 0, false );
+	context.lineTo( this.width / 2, bottom );
+	context.lineTo( -this.width / 2, bottom );
+	context.closePath();
+    }
+    else
+    {
+	var y = (SQRT3*this.width - this.height) / 2;
+
+	context.beginPath();
+	context.arc( this.width / 2, y, this.width, Math.PI, 4*Math.PI/3, false );
+	context.arc( -this.width / 2, y, this.width, 5*Math.PI/3, 0, false );
+	context.lineTo( this.width / 2, this.height / 2 );
+	context.lineTo( -this.width / 2, this.height / 2 );
+	context.closePath();
+    }
 }
 
 function EllipseOutline( width, height )

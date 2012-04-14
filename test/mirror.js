@@ -167,6 +167,8 @@ ShapeVis.prototype.doSelectShape = function( event )
 
     if( inLine && outLine )
     {
+	inLine.container = outLine;
+
 	this.inLine = inLine;
 	this.outLine = outLine;
 	this.handle = this.selected = null;
