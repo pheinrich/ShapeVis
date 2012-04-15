@@ -26,10 +26,12 @@ function ShapeVis( ui )
         outWidth:    panel.find( "div.dimensions input.width" )[0],
         outHeight:   panel.find( "div.dimensions input.height" )[0],
         border:      panel.find( "div.dimensions input.border" )[0],
-        resetBorder: panel.find( "div.dimensions input[type='button']" )[0],
+        resetBorder: panel.find( "div.dimensions input[type='button']" )[0]
+    };
 
-        cost: panel.find( "span.cost" )[0],
-	area: panel.find( "span.area" )[0]
+    this.cost = {
+        total: panel.find( "div.cost span.total" )[0],
+	area: panel.find( "div.cost span.area" )[0]
     };
 
     var that = this;
@@ -205,9 +207,9 @@ ShapeVis.prototype.draw = function()
     this.context.restore();
 
     area -= this.inLine.getArea();
-    $(this.controls.area).html( (Math.round( area / 14400 ) / 100) + " ft<sup>2</sup> (" +
+    $(this.cost.area).html( (Math.round( area / 14400 ) / 100) + " ft<sup>2</sup> (" +
                              (Math.round( area / 100 ) / 100) + " in<sup>2</sup>)" );
-    $(this.controls.cost).html( "$" + (Math.round( 325 * area / 14400 ) / 100) );
+    $(this.cost.total).html( "$" + (Math.round( 325 * area / 14400 ) / 100) );
 
     extent = this.inLine.getExtent();
     $(this.controls.inWidth).val( (Math.round( extent.width ) / 100) + " in" );

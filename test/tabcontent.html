@@ -25,8 +25,50 @@
 
               <hr/>
 
-              <span class="cost">Cost: <span>0</span></span>
-              <span class="area">Area: <span>0</span></span>
+              <div class="cost">
+                <span class="total">0</span>
+                <span class="area">0</span>
+
+                <table cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td>
+                      <span>Base:</span>
+                      <select class="base-material">
+                        <option value="birch12">Birch &frac12;&rdquo;</option>
+                        <option value="birch34">Birch &frac34;&rdquo;</option>
+                        <option value="acx12">ACX &frac12;&rdquo;</option>
+                        <option value="acx34">ACX &frac34;&rdquo;</option>
+                        <option value="plexi">Plexiglas&reg;</option>
+                      </select>
+                      <input type="checkbox" value="base-cut"/> Custom Cut
+                    </td>
+                    <td class="base, subtotal">
+                      $100.00
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <span>Opus:</span>
+                      <select class="opus">
+                        <option value="tessellatum">Tessellatum</option>
+                        <option value="palladianum">Palladianum</option>
+                      </select>
+                    </td>
+                    <td class="tesserae, subtotal">
+                      $75.25
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <span>Glass:</span>
+                      <input type="checkbox" value="glass-bevel"/> Bevel
+                    </td>
+                    <td class="glass, subtotal">
+                      $190.32
+                    </td>
+                  </tr>
+                </table>
+              </div>
 
               <div class="dimensions">
                 <span>Outside:</span>
