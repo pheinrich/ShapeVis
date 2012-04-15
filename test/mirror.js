@@ -168,6 +168,7 @@ ShapeVis.prototype.doSelectShape = function( event )
     if( inLine && outLine )
     {
 	inLine.container = outLine;
+	outLine.child = inLine;
 
 	this.inLine = inLine;
 	this.outLine = outLine;
@@ -239,9 +240,8 @@ ShapeVis.prototype.mouseMove = function( event )
 
 	if( this.selected == this.outLine )
 	    dirty = this.outLine.resize( this.handle, null, this.isAspectLocked );
-
-	if( dirty || this.selected == this.inLine )
-	    dirty |= this.inLine.resize( this.handle, null, this.isAspectLocked );
+	else if( this.selected == this.inLine )
+	    dirty = this.inLine.resize( this.handle, null, this.isAspectLocked );
 
 	if( dirty )
         {
