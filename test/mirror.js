@@ -241,9 +241,10 @@ ShapeVis.prototype.mouseMove = function( event )
 	this.handle.delta = { x: point.x - this.handle.x, y: point.y - this.handle.y };
 
 	if( this.selected == this.outLine )
-	    dirty = this.outLine.resize( this.handle, null, this.isAspectLocked );
-	else if( this.selected == this.inLine )
-	    dirty = this.inLine.resize( this.handle, null, this.isAspectLocked );
+	    dirty = this.outLine.resize( this.handle, this.isAspectLocked );
+	
+	if( dirty || this.selected == this.inLine )
+	    dirty = this.inLine.resize( this.handle, this.isAspectLocked );
 
 	if( dirty )
         {

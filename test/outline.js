@@ -131,6 +131,7 @@ RectangleOutline.prototype.resize = function( handle, lockAspect )
     if( handle )
     {
 	var rect  = { left: this.left, top: this.top, width: this.width, height: this.height };
+        var delta = { x: handle.delta.x, y: handle.delta.y };
 
 	if( Outline.handlePos.N & handle.pos )
 	    rect.height -= 2*handle.delta.y;
@@ -148,12 +149,20 @@ RectangleOutline.prototype.resize = function( handle, lockAspect )
 		rect.width = rect.height * this.width / this.height;
 	    else
 		rect.height = rect.width * this.height / this.width;
+
+	    delta.x = (rect.width - this.width) / 2;
+	    delta.y = (rect.height - this.height) / 2;
 	}
 
 	rect.left = -rect.width / 2;
 	rect.top = -rect.height / 2;
 
 	valid = (null != this.setExtent( rect ));
+        if( valid )
+	{
+	    handle.delta.x = delta.x;
+	    handle.delta.y = delta.y;
+	}
     }
 
     return( valid );
