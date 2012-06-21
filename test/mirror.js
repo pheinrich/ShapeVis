@@ -242,8 +242,7 @@ ShapeVis.prototype.mouseMove = function( event )
 
 	if( this.selected == this.outLine )
 	    dirty = this.outLine.resize( this.handle, this.isAspectLocked );
-	
-	if( dirty || this.selected == this.inLine )
+	else if( this.selected == this.inLine )
 	    dirty = this.inLine.resize( this.handle, this.isAspectLocked );
 
 	if( dirty )

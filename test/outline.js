@@ -48,7 +48,19 @@ Outline.prototype.setExtent = function( extent )
     // to assume valid dimensions, as well.  If it won't, childExtent will be
     // null.
     if( this.child )
-	childExtent = this.child.computeExtentFrom( extent );
+    {
+        var delta = { x: this.left - extent.left, y: this.top - extent.top };
+
+	childExtent = this.child.getExtent();
+
+	childExtent.left   -= delta.x;
+	childExtent.top    -= delta.y;
+	childExtent.width  += 2*delta.x;
+	childExtent.height += 2*delta.y;
+
+	if( childExtent.width <= 0 || childExtent.height <= 0 )
+	    childExtent = null;
+    }
 
     if( !this.child || childExtent )
     {
@@ -75,7 +87,7 @@ Outline.prototype.setExtent = function( extent )
 
     //  If we successfully changed our size, change our child, if appropriate.
     if( extent && childExtent )
-	this.childExtent.setExtent( childExtent );
+	this.child.setExtent( childExtent );
 
     return( extent );
 }
@@ -173,6 +185,7 @@ RectangleOutline.prototype.getExtent = function()
     return( { left: this.left, top: this.top, width: this.width, height: this.height } );
 }
 
+/*
 RectangleOutline.prototype.setExtent = function( rect )
 {
     rect.left = -rect.width / 2;
@@ -185,6 +198,7 @@ RectangleOutline.prototype.setExtent = function( rect )
 
     return( true );
 }
+*/
 
 RectangleOutline.prototype.getArea = function()
 {
