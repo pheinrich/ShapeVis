@@ -59,7 +59,7 @@ ShapeVis.tabTemplate = function( href, label )
     return( "<li><a href='#{href}'>#{label}</a> <span class='ui-icon ui-icon-close'>Remove Tab</span></li>" );
 }
 
-ShapeVis.prototype.getPosition = function( event )
+ShapeVis.prototype.getTarget = function( event )
 {
     var target;
 
@@ -75,6 +75,15 @@ ShapeVis.prototype.getPosition = function( event )
     if( 3 == target.nodeType )
 	target = target.parentNode;
 
+    return( target );
+}
+
+ShapeVis.prototype.getPosition = function( event )
+{
+    if( !event )
+	event = window.event;
+
+    var target = this.getTarget( event );
     var x = event.pageX - $(target).offset().left;
     var y = event.pageY - $(target).offset().top;
 
@@ -84,8 +93,49 @@ ShapeVis.prototype.getPosition = function( event )
     };
 }
 
+ShapeVis.prototype.getInches = function( control )
+{
+    return( $(control).val().replace( /^([0-9.+]+).*/, '$1' ) );
+}
+
 ShapeVis.prototype.doDimensions = function( event )
 {
+    var target = this.getTarget( event );
+    var extent = {};
+
+    if( target == this.controls.outWidth || target == this.controls.outHeight )
+    {
+	extent.width = 100 * this.getInches( this.controls.outWidth );
+	extent.height = 100 * this.getInches( this.controls.outHeight );
+	extent.left = -extent.width / 2;
+	extent.top = -extent.height / 2;
+
+	if( this.outLine.setExtent( extent ) )
+	    this.redraw();
+    }
+    else if( target == this.controls.inWidth || target == this.controls.inHeight )
+    {
+	extent.width = 100 * this.getInches( this.controls.inWidth );
+	extent.height = 100 * this.getInches( this.controls.inHeight );
+	extent.left = -extent.width / 2;
+	extent.top = -extent.height / 2;
+
+	if( this.inLine.setExtent( extent ) )
+	    this.redraw();
+    }
+    else if( target == this.controls.border )
+    {
+	var border = 100 * this.getInches( this.controls.border );
+	var outside = this.outLine.getExtent();
+
+	extent.width = outside.width - border;
+	extent.height = outside.height - border;
+	extent.left = -extent.width / 2;
+	extent.top = -extent.height / 2;
+
+	if( this.inLine.setExtent( extent ) )
+	    this.redraw();
+    }
 }
 
 ShapeVis.prototype.doLockAspect = function( event )
@@ -185,10 +235,11 @@ ShapeVis.prototype.doSelectShape = function( event )
 ShapeVis.prototype.draw = function()
 {
     var area = this.outLine.getArea();
-    var extent = this.outLine.getExtent();
+    var outside = this.outLine.getExtent();
+    var inside = this.inLine.getExtent();
 
-    $(this.controls.outWidth).val( (Math.round( extent.width ) / 100) + " in" );
-    $(this.controls.outHeight).val( (Math.round( extent.height ) / 100) + " in" );
+    $(this.controls.outWidth).val( (Math.round( outside.width ) / 100) + " in" );
+    $(this.controls.outHeight).val( (Math.round( outside.height ) / 100) + " in" );
 
     this.context.save();
     this.context.transform( this.zoom, 0, 0, this.zoom, this.origin.x, this.origin.y );
@@ -211,9 +262,13 @@ ShapeVis.prototype.draw = function()
                              (Math.round( area / 100 ) / 100) + " in<sup>2</sup>)" );
     $(this.cost.total).html( "$" + (Math.round( 325 * area / 14400 ) / 100) );
 
-    extent = this.inLine.getExtent();
-    $(this.controls.inWidth).val( (Math.round( extent.width ) / 100) + " in" );
-    $(this.controls.inHeight).val( (Math.round( extent.height ) / 100) + " in" );
+    $(this.controls.inWidth).val( (Math.round( inside.width ) / 100) + " in" );
+    $(this.controls.inHeight).val( (Math.round( inside.height ) / 100) + " in" );
+
+    if( outside.width - inside.width == outside.height - inside.height )
+	$(this.controls.border).val( (Math.round( outside.width - inside.width ) / 100) + " in" );
+    else
+	$(this.controls.border).val( "" );
 
     var gradient = this.context.createLinearGradient( 0, 0, this.canvas.width, this.canvas.height );
     gradient.addColorStop( 0, "#aaa" );
