@@ -41,19 +41,29 @@
     </style>
 
     <style>
-      #tabs { margin-top: 1em; }
+      #tabs { margin-top: 1em; clear: both; }
       #tabs li .ui-icon-close { float: left; margin: 0.4em 0.2em 0 0; cursor: pointer; }
       #add_tab { cursor: pointer; }
     </style>
 
     <script type="text/javascript" src="/js/jquery-1.7.1.min.js"></script>
     <script type="text/javascript" src="/js/jquery-ui-1.8.18.custom.min.js"></script>
+    <script type="text/javascript" src="ZeroClipboard.js"></script>
     <script type="text/javascript" src="mirror.js"></script>
     <script type="text/javascript" src="outline.js"></script>
   </head>
   <body>
     <div>
-      <button id="add_tab">New...</button>
+      <button id="add_tab">New</button>
+      <button id="clip_button">Copy Permalink</button>
+
+      <div id="flash" style="display: none;">
+        <div class="ui-state-highlight ui-corner-all" style="padding: 1ex;">
+          <span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
+          <strong>Link copied to clipboard</strong>
+        </div>
+      </div>
+
       <div id="tabs">
         <ul/>
       </div>
@@ -61,6 +71,7 @@
 
     <script>
       $(function() {
+        var clip = new ZeroClipboard.Client();
         var tab_counter = 1;
 
         // tabs init with a custom tab template and an "add" callback filling in the content
@@ -68,7 +79,7 @@
           tabTemplate: "<li><a href='#{href}'>#{label}</a> <span class='ui-icon ui-icon-close'>Remove Tab</span></li>",
           add: function( event, ui ) {
             $(ui.panel).load( "tabcontent.html", function() {
-              new ShapeVis( ui );
+              ui.panel.shapevis = new ShapeVis( ui );
             });
           }
         });
@@ -86,8 +97,29 @@
           $tabs.tabs( "remove", index );
         });
 
+        function getPermaLink()
+        {
+          var url = "http://zetamari.com/test/test4.html?";
+
+          $("#tabs > div" ).each( function( index, elem ) {
+            url += "&tab" + index + "=" + elem.shapevis.pack();
+          });
+
+          return( url );
+        }
+
+        clip.addEventListener( 'mouseOver', function( client ) {
+          clip.setText( getPermaLink() );
+        });
+
+        clip.addEventListener( 'complete', function( client, text ) {
+          $("#flash").show().fadeOut( "slow" );
+        });
+
+        $("#clip_button").button();
+        clip.glue( 'clip_button' );
         $("#add_tab").trigger( "click" );
-      });
+     });
     </script>
   </body>
 </html>

@@ -59,6 +59,26 @@ ShapeVis.tabTemplate = function( href, label )
     return( "<li><a href='#{href}'>#{label}</a> <span class='ui-icon ui-icon-close'>Remove Tab</span></li>" );
 }
 
+ShapeVis.prototype.pack = function()
+{
+    var params = $(this.controls.title).val();
+    params += '-' + $(this.controls.select).val()
+
+    var extent = this.inLine.getExtent();
+    params += '-' + extent.width + '-' + extent.height;
+
+    extent = this.outLine.getExtent();
+    params += '-' + extent.width + '-' + extent.height;
+
+    params += '-' + $(this.controls.zoomSlider).val();
+
+    return( encodeURIComponent( params ) );
+}
+
+ShapeVis.prototype.unpack = function( params )
+{
+}
+
 ShapeVis.prototype.getTarget = function( event )
 {
     var target;
