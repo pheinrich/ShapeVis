@@ -76,7 +76,7 @@ Outline.prototype.setExtent = function( extent )
 	}
 
 	// If there's still a bounding rect we can use, change our dimensions.
-	if( extent )
+	if( extent && extent.width > 0 && extent.height > 0 )
 	{
 	    this.left   = extent.left;
 	    this.top    = extent.top;
