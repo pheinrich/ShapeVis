@@ -87,15 +87,17 @@
             $(ui.panel).load( "tabcontent.html", function() {
               ui.panel.shapevis = new ShapeVis( ui );
 
-              if( packed )
-              {
-                var tab = packed.shift();
-                if( tab )
-                  ui.panel.shapevis.unpack( tab );
-              }
+              var tab = packed.shift();
+              if( tab )
+                ui.panel.shapevis.unpack( tab );
             });
           }
         });
+
+        function isArray( a )
+        {
+          return( Object.prototype.toString.apply( a ) === "[object Array]" );
+        }
 
         function getPermaLink()
         {
@@ -132,12 +134,13 @@
         $("#clip_button").button();
         clip.glue( 'clip_button' );
 
-        $("#add_tab").trigger( "click" );
-        if( packed )
-        {
-          for( var i = 1; i < packed.length; i++ )
-            $("#add_tab").trigger( "click" );
-        }
+        if( !packed )
+          packed = "tab=1500-2750-1000-2250-2-ellipse-Oval";
+        if( !isArray( packed ) )
+          packed = [ packed ];
+
+        for( var i = 0; i < packed.length; i++ )
+          $("#add_tab").trigger( "click" );
      });
     </script>
   </body>
