@@ -60,22 +60,35 @@ ShapeVis.tabTemplate = function( href, label )
 
 ShapeVis.prototype.pack = function()
 {
-    var params = $(this.controls.title).val();
-    params += '-' + $(this.controls.select).val()
-
     var extent = this.inLine.getExtent();
-    params += '-' + extent.width + '-' + extent.height;
+    var params = extent.width + '-' + extent.height;
 
     extent = this.outLine.getExtent();
     params += '-' + extent.width + '-' + extent.height;
 
     params += '-' + $(this.controls.zoomSlider).val();
+    params += '-' + $(this.controls.select).val();
+    params += '-' + encodeURIComponent( $(this.controls.title).val() );
 
-    return( encodeURIComponent( params ) );
+    return( params );
 }
 
 ShapeVis.prototype.unpack = function( params )
 {
+    params = params.split( '-' );
+    var vals = params.slice( 0, 5 ).map( function( val ) {
+        return( parseInt( val ) );
+    });
+
+    this.inLine.setExtent( { left: -vals[0] / 2, top: -vals[1] / 2, width: vals[0], height: vals[1] } );
+    this.outLine.setExtent( { left: -vals[2] / 2, top: -vals[3] / 2, width: vals[2], height: vals[3] } );
+
+    $(this.controls.zoomSlider).val( vals[4] );
+    $(this.controls.select).val( params[5] );
+    $(this.controls.title).val( decodeURIComponent( params[6] ) );
+
+    this.doZoomSlider();
+    this.doSelectShape();
 }
 
 ShapeVis.prototype.getTarget = function( event )
