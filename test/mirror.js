@@ -18,7 +18,6 @@ function ShapeVis( ui )
     this.controls = {
 	lockAspect:  panel.find( "div.view input:checkbox" )[0],
 	zoomSlider:  panel.find( "div.zoom input" )[0],
-	zoomValue:   panel.find( "div.zoom span" )[0],
         title:       panel.find( "div.controls input.title" )[0],
         select:      panel.find( "div.controls select" )[0],
         inWidth:     panel.find( "div.dimensions input.iwidth" )[0],
@@ -167,8 +166,7 @@ ShapeVis.prototype.doZoomSlider = function( event )
 {
     var value = $(this.controls.zoomSlider).val();
 
-    $(this.controls.zoomValue).html( value );
-    this.zoom = Math.pow( 1.5, value - 10 );
+    this.zoom = Math.pow( 1.5, value - 7 );
     this.redraw();
 }
 
