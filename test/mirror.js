@@ -60,15 +60,15 @@ ShapeVis.tabTemplate = function( href, label )
 
 ShapeVis.prototype.pack = function()
 {
-    var extent = this.inLine.getExtent();
+    var extent = this.outLine.getExtent();
     var params = extent.width + '-' + extent.height;
 
-    extent = this.outLine.getExtent();
+    extent = this.inLine.getExtent();
     params += '-' + extent.width + '-' + extent.height;
 
     params += '-' + $(this.controls.zoomSlider).val();
     params += '-' + $(this.controls.select).val();
-    params += '-' + encodeURIComponent( $(this.controls.title).val() );
+    params += '-' + $(this.controls.title).val();
 
     return( params );
 }
@@ -80,15 +80,18 @@ ShapeVis.prototype.unpack = function( params )
         return( parseInt( val ) );
     });
 
-    this.inLine.setExtent( { left: -vals[0] / 2, top: -vals[1] / 2, width: vals[0], height: vals[1] } );
-    this.outLine.setExtent( { left: -vals[2] / 2, top: -vals[3] / 2, width: vals[2], height: vals[3] } );
+    // Must do these in the correct order, since inside is limited by outside.
+    this.outLine.setExtent( { left: -vals[0] / 2, top: -vals[1] / 2, width: vals[0], height: vals[1] } );
+    this.inLine.setExtent( { left: -vals[2] / 2, top: -vals[3] / 2, width: vals[2], height: vals[3] } );
 
     $(this.controls.zoomSlider).val( vals[4] );
     $(this.controls.select).val( params[5] );
-    $(this.controls.title).val( decodeURIComponent( params[6] ) );
 
     this.doZoomSlider();
     this.doSelectShape();
+
+    $(this.controls.title).val( params[6] );
+    $(this.controls.title).change();
 }
 
 ShapeVis.prototype.getTarget = function( event )
