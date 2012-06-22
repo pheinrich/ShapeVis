@@ -246,7 +246,7 @@ ShapeVis.prototype.doSelectShape = function( event )
 	this.outLine = outLine;
 	this.handle = this.selected = null;
 
-	$(this.controls.title).val( $(this.controls.select).find( "option:selected" ).text() );
+	$(this.controls.title).val( $(this.controls.select).find( "option:selected" ).text().trim() );
 	$(this.controls.title).trigger( "change" );
 	this.redraw();
     }
