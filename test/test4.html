@@ -53,7 +53,9 @@
 
     <script type="text/javascript" src="/js/jquery-1.7.1.min.js"></script>
     <script type="text/javascript" src="/js/jquery-ui-1.8.18.custom.min.js"></script>
-    <script type="text/javascript" src="ZeroClipboard.js"></script>
+    <script type="text/javascript" src="/js/URI.min.js"></script>
+    <script type="text/javascript" src="/js/jquery.URI.min.js"></script>
+    <script type="text/javascript" src="/js/ZeroClipboard.js"></script>
     <script type="text/javascript" src="mirror.js"></script>
     <script type="text/javascript" src="outline.js"></script>
   </head>
@@ -74,6 +76,7 @@
 
     <script>
       $(function() {
+        var packed = URI( document.URL ).query( true ).tab;
         var clip = new ZeroClipboard.Client();
         var tab_counter = 1;
 
@@ -83,9 +86,27 @@
           add: function( event, ui ) {
             $(ui.panel).load( "tabcontent.html", function() {
               ui.panel.shapevis = new ShapeVis( ui );
+
+              if( packed )
+              {
+                var tab = packed.shift();
+                if( tab )
+                  ui.panel.shapevis.unpack( tab );
+              }
             });
           }
         });
+
+        function getPermaLink()
+        {
+          var uri = new URI( "http://zetamari.com/test/test4.html" );
+
+          $("#tabs > div" ).each( function( index, elem ) {
+            uri.addQuery( "tab", elem.shapevis.pack() );
+          });
+
+          return( uri.toString() );
+        }
 
         $("#add_tab").button().click( function() {
           var tab_title = "Tab " + tab_counter;
@@ -100,17 +121,6 @@
           $tabs.tabs( "remove", index );
         });
 
-        function getPermaLink()
-        {
-          var url = "http://zetamari.com/test/test4.html?";
-
-          $("#tabs > div" ).each( function( index, elem ) {
-            url += "&tab" + index + "=" + elem.shapevis.pack();
-          });
-
-          return( url );
-        }
-
         clip.addEventListener( 'mouseOver', function( client ) {
           clip.setText( getPermaLink() );
         });
@@ -121,7 +131,13 @@
 
         $("#clip_button").button();
         clip.glue( 'clip_button' );
+
         $("#add_tab").trigger( "click" );
+        if( packed )
+        {
+          for( var i = 1; i < packed.length; i++ )
+            $("#add_tab").trigger( "click" );
+        }
      });
     </script>
   </body>
