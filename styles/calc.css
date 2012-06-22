@@ -1,0 +1,52 @@
+@import url( "/zetamari.css" );
+
+.calculator
+{
+  border-top: 2px #600 solid;
+  clear: right;
+  font-size: 0.75em;
+  line-height: 1.25em;
+  margin-bottom: 3em;
+  padding-top: 1ex;
+  width: 100%;
+}
+
+.calculator .form
+{
+  width: 90%;
+}
+
+.calculator .result
+{
+  background-color: #ddd;
+  font-size: 1.5em;
+  font-weight: bold;
+  text-align: center;
+}
+
+.canvas
+{
+  background-color: #eee;
+  border: 1px #333 dotted;
+  float: right;
+  font-size: 0.75em;
+  line-height: 1.25em;
+  margin: 1ex 1ex;
+  padding: 1ex;
+  position: relative;
+  text-align: center;
+  width: 200px;
+}
+
+.canvas P
+{
+  margin-bottom: 1em;
+  margin-left: 1em;
+  text-align: left;
+}
+
+.canvas DIV
+{
+  margin: 0;
+  padding: 0;
+}
