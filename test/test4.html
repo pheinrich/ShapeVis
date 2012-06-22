@@ -40,10 +40,15 @@
         margin-top: 1em; }
     </style>
 
-    <style>
-      #tabs { margin-top: 1em; clear: both; }
+    <style type="text/css">
       #tabs li .ui-icon-close { float: left; margin: 0.4em 0.2em 0 0; cursor: pointer; }
       #add_tab { cursor: pointer; }
+      #flash {
+        display: none;
+        border: 0;
+        font-size: 9pt;
+        font-weight: bold;
+        padding: 3px 10px; }
     </style>
 
     <script type="text/javascript" src="/js/jquery-1.7.1.min.js"></script>
@@ -57,11 +62,9 @@
       <button id="add_tab">New</button>
       <button id="clip_button">Copy Permalink</button>
 
-      <div id="flash" style="display: none;">
-        <div class="ui-state-highlight ui-corner-all" style="padding: 1ex;">
-          <span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
-          <strong>Link copied to clipboard</strong>
-        </div>
+      <div id="flash" class="ui-state-highlight ui-widget">
+        <span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
+        Link copied to clipboard
       </div>
 
       <div id="tabs">
@@ -113,7 +116,7 @@
         });
 
         clip.addEventListener( 'complete', function( client, text ) {
-          $("#flash").show().fadeOut( "slow" );
+          $("#flash").css( "display", "inline-block" ).delay( 1000 ).fadeOut( "slow" );
         });
 
         $("#clip_button").button();
