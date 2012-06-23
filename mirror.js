@@ -30,7 +30,14 @@ function ShapeVis( ui )
 
     this.cost = {
         total: panel.find( "div.cost span.total" )[0],
-	area: panel.find( "div.cost span.area" )[0]
+	area: panel.find( "div.cost span.area" )[0],
+        base: panel.find( "div.details select.base-material" )[0],
+        baseCut:  panel.find( "div.details input.base-cut" )[0],
+        baseSub: panel.find( "div.details span.base" )[0],
+        opus: panel.find( "div.details select.opus" )[0],
+        opusSub: panel.find( "div.details span.tesserae" )[0],
+        glassBevel: panel.find( "div.details input.glass-bevel" )[0],
+        glassSub: panel.find( "div.details span.glass" )[0]
     };
 
     var that = this;
@@ -45,6 +52,9 @@ function ShapeVis( ui )
     $(this.controls.resetBorder).click( function( event ) { that.doResetBorder.call( that, event ) } );
     $(this.controls.select).change( function( event ) { that.doSelectShape.call( that, event ) } );
 
+    $(this.cost.total).click( function( event ) { $("div.cost div.details").toggle( "drop" ) } );
+    panel.find( "div.details" ).change( function( event ) { that.updatePrice() } );
+
     this.canvas.addEventListener( "mousemove", function( event ) { that.mouseMove.call( that, event ) }, false );
     this.canvas.addEventListener( "mousedown", function( event ) { that.mouseDown.call( that, event ) }, false );
     this.canvas.addEventListener( "mouseup",   function( event ) { that.mouseUp.call( that, event ) },   false );
@@ -52,6 +62,12 @@ function ShapeVis( ui )
     this.doZoomSlider();
     this.doSelectShape();
 }
+
+ShapeVis.basePrice = { birch12: 25 / 16, birch34: 26 / 16, acx12: 30 / 32, acx34: 38 / 32, plexi: 209 / 32 };
+ShapeVis.customCutPrice  = 30;
+ShapeVis.opusPrice = { tessellatum: 325, palladianum: 350 };
+ShapeVis.glassPrice = 4;
+ShapeVis.glassBevelPrice = 125; 
 
 ShapeVis.tabTemplate = function( href, label )
 {
@@ -83,6 +99,7 @@ ShapeVis.prototype.unpack = function( params )
     // Must do these in the correct order, since inside is limited by outside.
     this.outLine.setExtent( { left: -vals[0] / 2, top: -vals[1] / 2, width: vals[0], height: vals[1] } );
     this.inLine.setExtent( { left: -vals[2] / 2, top: -vals[3] / 2, width: vals[2], height: vals[3] } );
+    this.updatePrice();
 
     $(this.controls.zoomSlider).val( vals[4] );
     $(this.controls.select).val( params[5] );
@@ -146,7 +163,10 @@ ShapeVis.prototype.doDimensions = function( event )
 	extent.top = -extent.height / 2;
 
 	if( this.outLine.setExtent( extent ) )
+	{
+            this.updatePrice();
 	    this.redraw();
+	}
     }
     else if( target == this.controls.inWidth || target == this.controls.inHeight )
     {
@@ -156,7 +176,10 @@ ShapeVis.prototype.doDimensions = function( event )
 	extent.top = -extent.height / 2;
 
 	if( this.inLine.setExtent( extent ) )
+	{
+	    this.updatePrice();
 	    this.redraw();
+	}
     }
     else if( target == this.controls.border )
     {
@@ -169,8 +192,36 @@ ShapeVis.prototype.doDimensions = function( event )
 	extent.top = -extent.height / 2;
 
 	if( this.inLine.setExtent( extent ) )
+	{
+	    this.updatePrice();
 	    this.redraw();
+	}
     }
+}
+
+ShapeVis.prototype.updatePrice = function()
+{
+    this.area = this.outLine.getArea() - this.inLine.getArea();
+    $(this.cost.area).html( (this.area / 1440000).toFixed( 2 ) + ' ft<sup>2</sup> (' + (this.area / 10000).toFixed( 2 ) + ' in<sup>2</sup>)' );
+
+    var extent = this.outLine.getExtent();
+    var baseSub = extent.width * extent.height / 1440000 * ShapeVis.basePrice[ $(this.cost.base).val() ];
+    var opusSub = this.area / 1440000 * ShapeVis.opusPrice[ $(this.cost.opus).val() ];
+
+    if( $(this.cost.baseCut).is( ":checked" ) )
+	baseSub += ShapeVis.customCutPrice;
+
+    $(this.cost.baseSub).html( '$' + baseSub.toFixed( 2 ) );
+    $(this.cost.opusSub).html( '$' + opusSub.toFixed( 2 ) );
+
+    extent = this.inLine.getExtent();
+    var glassSub = extent.width * extent.height / 1440000 * ShapeVis.glassPrice;
+
+    if( $(this.cost.glassBevel).is( ":checked" ) )
+	glassSub += ShapeVis.glassBevelPrice;
+
+    $(this.cost.glassSub).html( '$' + glassSub.toFixed( 2 ) );
+    $(this.cost.total).html( '$' + (baseSub + opusSub + glassSub).toFixed( 2 ) );
 }
 
 ShapeVis.prototype.doLockAspect = function( event )
@@ -198,6 +249,7 @@ ShapeVis.prototype.doResetBorder = function( event )
     inside.top = -inside.height / 2;
 
     this.inLine.setExtent( inside );
+    this.updatePrice();
     this.redraw();
 }
 
@@ -262,13 +314,14 @@ ShapeVis.prototype.doSelectShape = function( event )
 
 	$(this.controls.title).val( $(this.controls.select).find( "option:selected" ).text().trim() );
 	$(this.controls.title).trigger( "change" );
+
+	this.updatePrice();
 	this.redraw();
     }
 }
 
 ShapeVis.prototype.draw = function()
 {
-    var area = this.outLine.getArea();
     var outside = this.outLine.getExtent();
     var inside = this.inLine.getExtent();
 
@@ -291,10 +344,7 @@ ShapeVis.prototype.draw = function()
     this.inLine.trace( this.context );
     this.context.restore();
 
-    area -= this.inLine.getArea();
-    $(this.cost.area).html( (Math.round( area / 14400 ) / 100) + " ft<sup>2</sup> (" +
-                             (Math.round( area / 100 ) / 100) + " in<sup>2</sup>)" );
-    $(this.cost.total).html( "$" + (Math.round( 325 * area / 14400 ) / 100) );
+    $(this.cost.total).html( "$" + (Math.round( 325 * this.area / 14400 ) / 100) );
 
     $(this.controls.inWidth).val( (Math.round( inside.width ) / 100) + " in" );
     $(this.controls.inHeight).val( (Math.round( inside.height ) / 100) + " in" );
@@ -337,6 +387,7 @@ ShapeVis.prototype.mouseMove = function( event )
 	if( dirty )
         {
 	    this.handle.x = point.x; this.handle.y = point.y;
+            this.updatePrice();
 	    this.redraw();
 	}
     }
