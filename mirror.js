@@ -63,10 +63,10 @@ function ShapeVis( ui )
     this.doSelectShape();
 }
 
-ShapeVis.basePrice = { birch12: 25 / 16, birch34: 26 / 16, acx12: 30 / 32, acx34: 38 / 32, plexi: 209 / 32 };
+ShapeVis.basePrice = { birch12: 50 / 16, birch34: 52 / 16, acx12: 60 / 32, acx34: 76 / 32, plexi: 418 / 32 };
 ShapeVis.customCutPrice  = 30;
 ShapeVis.opusPrice = { tessellatum: 325, palladianum: 350 };
-ShapeVis.glassPrice = 4;
+ShapeVis.glassPrice = 8;
 ShapeVis.glassBevelPrice = 125; 
 
 ShapeVis.tabTemplate = function( href, label )
@@ -78,12 +78,20 @@ ShapeVis.prototype.pack = function()
 {
     var extent = this.outLine.getExtent();
     var params = extent.width + '-' + extent.height;
+    var bits = parseInt( $(this.controls.zoomSlider).val() );
 
     extent = this.inLine.getExtent();
     params += '-' + extent.width + '-' + extent.height;
 
-    params += '-' + $(this.controls.zoomSlider).val();
-    params += '-' + $(this.controls.select).val();
+    if( $(this.cost.baseCut).is( ':checked' ) )
+        bits += 4;
+    if( $(this.cost.glassBevel).is( ':checked' ) )
+        bits += 8;
+
+    params += '-' + bits;
+    params += '-' + $(this.controls.select).prop( 'selectedIndex' );
+    params += '-' + $(this.cost.base).prop( 'selectedIndex' );
+    params += '-' + $(this.cost.opus).prop( 'selectedIndex' );
     params += '-' + $(this.controls.title).val();
 
     return( params );
@@ -92,23 +100,28 @@ ShapeVis.prototype.pack = function()
 ShapeVis.prototype.unpack = function( params )
 {
     params = params.split( '-' );
-    var vals = params.slice( 0, 5 ).map( function( val ) {
+    var vals = params.slice( 0, 8 ).map( function( val ) {
         return( parseInt( val ) );
     });
 
     // Must do these in the correct order, since inside is limited by outside.
     this.outLine.setExtent( { left: -vals[0] / 2, top: -vals[1] / 2, width: vals[0], height: vals[1] } );
     this.inLine.setExtent( { left: -vals[2] / 2, top: -vals[3] / 2, width: vals[2], height: vals[3] } );
-    this.updatePrice();
 
-    $(this.controls.zoomSlider).val( vals[4] );
-    $(this.controls.select).val( params[5] );
+    $(this.controls.zoomSlider).val( vals[4] & 0x03 );
+    $(this.cost.baseCut).attr( 'checked', 0 != (vals[4] & 0x04) );
+    $(this.cost.glassBevel).attr( 'checked', 0 != (vals[4] & 0x08) );
+    $(this.controls.select).prop( 'selectedIndex', vals[5] );
+    $(this.cost.base).prop( 'selectedIndex', vals[6] );
+    $(this.cost.opus).prop( 'selectedIndex', vals[7] );
 
     this.doZoomSlider();
     this.doSelectShape();
 
-    $(this.controls.title).val( params[6] );
+    $(this.controls.title).val( params[8] );
     $(this.controls.title).change();
+
+    this.updatePrice();
 }
 
 ShapeVis.prototype.getTarget = function( event )
