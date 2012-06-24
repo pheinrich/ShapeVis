@@ -30,7 +30,9 @@ function ShapeVis( ui )
 
     this.cost = {
         total: panel.find( "div.cost span.total" )[0],
+        togdets: panel.find( "div.cost span.togdets" )[0],
 	area: panel.find( "div.cost span.area" )[0],
+        details: panel.find( "div.cost div.details" )[0],
         base: panel.find( "div.details select.base-material" )[0],
         baseCut:  panel.find( "div.details input.base-cut" )[0],
         baseSub: panel.find( "div.details span.base" )[0],
@@ -52,8 +54,8 @@ function ShapeVis( ui )
     $(this.controls.resetBorder).click( function( event ) { that.doResetBorder.call( that, event ) } );
     $(this.controls.select).change( function( event ) { that.doSelectShape.call( that, event ) } );
 
-    $(this.cost.total).click( function( event ) { $("div.cost div.details").toggle( "drop" ) } );
-    panel.find( "div.details" ).change( function( event ) { that.updatePrice() } );
+    $(this.cost.togdets).click( function( event ) { $(that.cost.details).toggle( "drop" ) } );
+    $(this.cost.details).change( function( event ) { that.updatePrice() } );
 
     this.canvas.addEventListener( "mousemove", function( event ) { that.mouseMove.call( that, event ) }, false );
     this.canvas.addEventListener( "mousedown", function( event ) { that.mouseDown.call( that, event ) }, false );
