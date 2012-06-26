@@ -359,8 +359,6 @@ ShapeVis.prototype.draw = function()
     this.inLine.trace( this.context );
     this.context.restore();
 
-    $(this.cost.total).html( "$" + (Math.round( 325 * this.area / 14400 ) / 100) );
-
     $(this.controls.inWidth).val( (Math.round( inside.width ) / 100) + " in" );
     $(this.controls.inHeight).val( (Math.round( inside.height ) / 100) + " in" );
 
