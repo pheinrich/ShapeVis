@@ -25,12 +25,17 @@ function Outline()
 Outline.handleSize = 5;
 Outline.handlePos = { N: 1 << 0, E: 1 << 1, W: 1 << 2, S: 1 << 3 };
  
+Outline.prototype.isExtentValid = function( extent )
+{
+    return( 0 < extent.width && 0 < extent.height );
+}
+
 Outline.prototype.getHandle = function( point )
 {
     return null;
 }
 
-Outline.prototype.resize = function( handle, point, limit )
+Outline.prototype.resize = function( handle, lockAspect )
 {
     return null;
 }
@@ -58,8 +63,10 @@ Outline.prototype.setExtent = function( extent )
 	childExtent.width  += 2*delta.x;
 	childExtent.height += 2*delta.y;
 
-	if( childExtent.width <= 0 || childExtent.height <= 0 )
+        if( !this.child.isExtentValid( childExtent ) )
 	    childExtent = null;
+	//	if( childExtent.width <= 0 || childExtent.height <= 0 )
+	//	    childExtent = null;
     }
 
     if( !this.child || childExtent )
@@ -75,8 +82,11 @@ Outline.prototype.setExtent = function( extent )
 		    extent = null;
 	}
 
+	if( !this.isExtentValid( extent ) )
+	    extent = null;
+
 	// If there's still a bounding rect we can use, change our dimensions.
-	if( extent && extent.width > 0 && extent.height > 0 )
+	if( extent )
 	{
 	    this.left   = extent.left;
 	    this.top    = extent.top;
@@ -90,11 +100,6 @@ Outline.prototype.setExtent = function( extent )
 	this.child.setExtent( childExtent );
 
     return( extent );
-}
-
-Outline.prototype.computeExtentFrom = function( extent )
-{
-    return( { left: this.left, top: this.top, width: this.width, height: this.height } );
 }
 
 Outline.prototype.getArea = function()
@@ -246,6 +251,13 @@ CathedralOutline.prototype.contains = function( point, a, b )
     return( inside );
 }
 
+CathedralOutline.prototype.isExtentValid = function( extent )
+{
+    var valid = CathedralOutline.prototype.parent.isExtentValid.call( this, extent );
+
+    return( valid && extent.width / 2 <= extent.height );
+}
+
 CathedralOutline.prototype.getHandle = function( point, handleSize )
 {
     var outsideMin = !this.contains( point, (this.width - handleSize) / 2, (this.height - handleSize) / 2 );
@@ -278,17 +290,6 @@ CathedralOutline.prototype.getHandle = function( point, handleSize )
     return( pos ? { x: point.x, y: point.y, pos: pos } : null );
 }
 
-CathedralOutline.prototype.limit = function( outline, rect, handle )
-{
-    if( outline.container && handle && (Outline.handlePos.S & handle.pos) )
-    {
-	rect.top = outline.top;
-	rect.height += (outline.height - rect.height) / 2;
-    }
-
-    return( true );
-}
-
 CathedralOutline.prototype.getArea = function()
 {
     return( this.width * (this.height - this.width/2 * (1 - Math.PI/4)) );
@@ -316,6 +317,26 @@ GothicOutline.inheritsFrom( RectangleOutline );
 GothicOutline.prototype.contains = function( point, a, b )
 {
     return( GothicOutline.prototype.parent.contains.call( this, point, a, b ) );
+}
+
+GothicOutline.prototype.isExtentValid = function( extent )
+{
+    var valid = GothicOutline.prototype.parent.isExtentValid.call( this, extent );
+ 
+    if( valid )
+    {
+	var halfW = extent.width / 2;
+	var y = 0;
+
+	if( this.container )
+	    y = extent.width;
+	else
+	    y = SQRT3 * halfW;
+
+	valid = y <= extent.height;
+    }
+
+    return( valid );
 }
 
 GothicOutline.prototype.getHandle = function( point, handleSize )
