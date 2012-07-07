@@ -314,39 +314,37 @@ function GothicOutline( width, height )
 
 GothicOutline.inheritsFrom( RectangleOutline );
 
-GothicOutline.prototype.contains = function( point, a, b )
-{
-    return( GothicOutline.prototype.parent.contains.call( this, point, a, b ) );
-}
-
 GothicOutline.prototype.isExtentValid = function( extent )
 {
     var valid = GothicOutline.prototype.parent.isExtentValid.call( this, extent );
  
-    if( valid )
-    {
-	var halfW = extent.width / 2;
-	var y = 0;
-
-	if( this.container )
-	    y = extent.width;
-	else
-	    y = SQRT3 * halfW;
-
-	valid = y <= extent.height;
-    }
+    if( valid && !this.container )
+	valid = SQRT3*extent.width <= 2*extent.height;
 
     return( valid );
 }
 
-GothicOutline.prototype.getHandle = function( point, handleSize )
-{
-    return( GothicOutline.prototype.parent.getHandle.call( this, point, handleSize ) );
-}
-
 GothicOutline.prototype.getArea = function()
 {
-    return( GothicOutline.prototype.parent.getArea.call( this ) );
+    var radius, a, y;
+
+    if( this.container )
+    {
+	radius = (this.container.width + this.width) / 2;
+	a = 2*Math.acos( this.container.width / (2*radius) );
+        y = this.container.height - ((1 + SQRT3)*this.container.width - this.width) / 2;
+    }
+    else
+    {
+	radius = this.width;
+	a = 2*Math.PI / 3;
+	y = this.height - SQRT3*this.width / 2;
+    }
+
+    var area = radius*radius * (a - Math.sin( a )) / 2;
+    area += this.width * y;
+
+    return( area );
 }
 
 GothicOutline.prototype.trace = function( context )
@@ -357,7 +355,7 @@ GothicOutline.prototype.trace = function( context )
 	var radius = (this.container.width + this.width) / 2;
 	var a = Math.acos( this.container.width / (2*radius) );
 	var y = (SQRT3*this.container.width - this.container.height) / 2;
-	var bottom = Math.min( this.container.height - border, y - (radius * Math.sin( a )) + this.height );
+	var bottom = this.container.height / 2 - border;
 
 	context.beginPath();
 	context.arc( this.container.width / 2, y, radius, Math.PI, Math.PI + a, false );
