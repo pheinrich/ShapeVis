@@ -201,8 +201,8 @@ ShapeVis.prototype.doDimensions = function( event )
 	var border = 100 * this.getInches( this.controls.border );
 	var outside = this.outLine.getExtent();
 
-	extent.width = outside.width - border;
-	extent.height = outside.height - border;
+	extent.width = outside.width - 2*border;
+	extent.height = outside.height - 2*border;
 	extent.left = -extent.width / 2;
 	extent.top = -extent.height / 2;
 
@@ -363,7 +363,7 @@ ShapeVis.prototype.draw = function()
     $(this.controls.inHeight).val( (Math.round( inside.height ) / 100) + " in" );
 
     if( outside.width - inside.width == outside.height - inside.height )
-	$(this.controls.border).val( (Math.round( outside.width - inside.width ) / 100) + " in" );
+	$(this.controls.border).val( (Math.round( outside.width - inside.width ) / 200) + " in" );
     else
 	$(this.controls.border).val( "" );
 
