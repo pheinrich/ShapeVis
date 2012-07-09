@@ -18,12 +18,12 @@ function ShapeVis( ui )
     this.controls = {
 	lockAspect:  panel.find( "div.view input:checkbox" )[0],
 	zoomSlider:  panel.find( "div.zoom input" )[0],
-        title:       panel.find( "div.controls input.title" )[0],
+        title:       panel.find( "div.controls input.shptitle" )[0],
         select:      panel.find( "div.controls select" )[0],
         inWidth:     panel.find( "div.dimensions input.iwidth" )[0],
         inHeight:    panel.find( "div.dimensions input.iheight" )[0],
-        outWidth:    panel.find( "div.dimensions input.width" )[0],
-        outHeight:   panel.find( "div.dimensions input.height" )[0],
+        outWidth:    panel.find( "div.dimensions input.owidth" )[0],
+        outHeight:   panel.find( "div.dimensions input.oheight" )[0],
         border:      panel.find( "div.dimensions input.border" )[0],
         resetBorder: panel.find( "div.dimensions input[type='button']" )[0]
     };
